@@ -55,7 +55,7 @@ public class RobotController : MonoBehaviour
         }
     }
 
-    void Die()
+    public void Die()
     {
         Debug.Log(gameObject.name + " has been destroyed!");
         gameObject.SetActive(false);  // Disables the robot
