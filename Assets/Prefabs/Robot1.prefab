@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 6181392499785453851}
   - component: {fileID: 5515398099452217085}
   - component: {fileID: 1212528461840297534}
+  - component: {fileID: 1437295769386466032}
   m_Layer: 0
   m_Name: Robot1
   m_TagString: Untagged
@@ -61,7 +62,7 @@ Transform:
   m_GameObject: {fileID: 8362756637322418308}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.99, y: 0, z: 0}
+  m_LocalPosition: {x: -5.99, y: -1.49, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -233,10 +234,23 @@ MonoBehaviour:
   rb2D: {fileID: 5515398099452217085}
   movementVelocity: 2
   lookRight: 1
-  jumpPower: 4
+  jumpPower: 5
   isFloor:
     serializedVersion: 2
     m_Bits: 8
   FloorController: {fileID: 1826332008025839875}
   boxDimensions: {x: 0.61, y: 0.15, z: 0}
   inFloor: 0
+--- !u!114 &1437295769386466032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8362756637322418308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee47f6aeb853427439965080245017d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 5515398099452217085}

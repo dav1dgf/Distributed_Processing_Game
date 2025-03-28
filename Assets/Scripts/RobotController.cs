@@ -60,4 +60,17 @@ public class RobotController : MonoBehaviour
         Debug.Log(gameObject.name + " has been destroyed!");
         gameObject.SetActive(false);  // Disables the robot
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        EvaluateCollision(collision.gameObject);
+    }
+
+    public void EvaluateCollision(GameObject collision)
+    {
+        if (collision.CompareTag("Spike"))
+        {
+            TakeDamage(100);
+        }
+    }
 }
