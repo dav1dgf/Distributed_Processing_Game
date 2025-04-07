@@ -342,7 +342,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 230582128}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &230582128
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -817,9 +829,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1014833964}
-        m_TargetAssemblyTypeName: Menuinicial, Assembly-CSharp
-        m_MethodName: Salir
+      - m_Target: {fileID: 1014833965}
+        m_TargetAssemblyTypeName: EXITBUTTON, Assembly-CSharp
+        m_MethodName: ExitButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -959,6 +971,7 @@ GameObject:
   - component: {fileID: 1014833961}
   - component: {fileID: 1014833960}
   - component: {fileID: 1014833964}
+  - component: {fileID: 1014833965}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1059,6 +1072,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0f45721608354ee4bb68c775c01f9ddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1014833965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1014833959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 404ad64c41afd034692939fd58008f37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1229302133

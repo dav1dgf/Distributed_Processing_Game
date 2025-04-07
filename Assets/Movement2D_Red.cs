@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Movement2D_Blue : MonoBehaviour
+public class Movement2D_Red : MonoBehaviour
 {
-    public ControlsBLUE controls;
+    public ControlsRED controls;
 
     public Vector2 direction;
 
@@ -53,10 +53,11 @@ public class Movement2D_Blue : MonoBehaviour
     }
     public void AdjustRotation(float directionX)
     {
-        if (directionX > 0 && !lookRight)
+        if (directionX > 0 && lookRight)
         {
             ChangeDirection();
-        }else if (directionX < 0 && lookRight)
+        }
+        else if (directionX < 0 && !lookRight)
         {
             ChangeDirection();
         }
