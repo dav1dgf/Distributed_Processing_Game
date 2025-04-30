@@ -40,6 +40,6 @@ public class TurnManager : MonoBehaviour
     {
         isPlayerTurn = !isPlayerTurn;
         movesLeft = 3;  // Reset moves for new turn
-        Debug.Log("Turn switched! Player turn: " + isPlayerTurn);
+       // Debug.Log("Turn switched! Player turn: " + isPlayerTurn);
     }
 }

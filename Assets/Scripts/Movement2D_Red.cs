@@ -12,6 +12,8 @@ public class Movement2D_Red : MonoBehaviour
 
     public float movementVelocity;
 
+    public Weapon weapon; 
+
     public bool lookRight;
 
     public float jumpPower;
@@ -31,12 +33,22 @@ public class Movement2D_Red : MonoBehaviour
     {
         controls.Enable();
         controls.Movement.Jump.started += _ => Jump();
+        controls.Movement.Attack.started += _ => Attack(); // New
     }
 
     private void OnDisable()
     {
         controls.Disable();
         controls.Movement.Jump.started -= _ => Jump();
+        controls.Movement.Attack.started -= _ => Attack(); // New
+    }
+
+    private void Attack()
+    {
+        if (weapon != null)
+        {
+            weapon.Fire();
+        }
     }
 
     private void Update()

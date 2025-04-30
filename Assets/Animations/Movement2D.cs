@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Movement2D_Blue : MonoBehaviour
 {
+    //Change this to reference to robot weapon
+    public Weapon weapon;
+
     public ControlsBLUE controls;
 
     public Vector2 direction;
@@ -31,12 +34,14 @@ public class Movement2D_Blue : MonoBehaviour
     {
         controls.Enable();
         controls.Movement.Jump.started += _ => Jump();
+        controls.Movement.Attack.started += _ => Attack(); // New
     }
 
     private void OnDisable()
     {
         controls.Disable();
         controls.Movement.Jump.started -= _ => Jump();
+        controls.Movement.Attack.started -= _ => Attack(); // New
     }
 
     private void Update()
@@ -81,5 +86,14 @@ public class Movement2D_Blue : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(FloorController.position, boxDimensions);
+    }
+
+    private void Attack()
+    {
+        if (weapon != null)
+        {
+            Debug.Log("Bullet fired!");
+            weapon.Fire();
+        }
     }
 }
