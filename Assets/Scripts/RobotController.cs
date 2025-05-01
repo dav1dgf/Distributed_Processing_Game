@@ -1,48 +1,116 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class RobotController : MonoBehaviour
 {
+    // Movement and Attack variables
+    public Weapon weapon;
+    public InputActionAsset controls;
     public float moveDistance = 1f;
-    public float arenaLeftLimit = -5f;  // Left boundary
-    public float arenaRightLimit = 5f;  // Right boundary
-    public Transform enemyRobot;  // The opponent
-    public RobotController enemyController;  // Reference to the opponent's script
-    public int numActions = 0;
+    public float movementVelocity = 5f;
+    public float jumpPower = 10f;
+    public bool lookLeft;
     public float maxHealth = 100f;
     private float currentHealth;
-    public float attackDamage = 20f;
     public HealthBar healthBar;
 
+    // Arena boundaries and enemy robot
+    public float arenaLeftLimit = -5f;
+    public float arenaRightLimit = 5f;
+    public Transform enemyRobot;
+    //public RobotController enemyController;
 
-    public void Move(Vector2 direction)
+    // Physics and Collision
+    public Rigidbody2D rb2D;
+    public LayerMask isFloor;
+    public Transform FloorController;
+    public Vector3 boxDimensions;
+
+    private Vector2 direction;
+    private bool inFloor;
+    private InputActionMap movementActions;
+
+    private void Awake()
     {
-        float newPositionX = transform.position.x + (direction.x * moveDistance);
-
-        // Prevent moving out of bounds or colliding with the enemy
-        if (newPositionX > arenaRightLimit || newPositionX < arenaLeftLimit || Mathf.Abs(newPositionX - enemyRobot.position.x) < moveDistance)
+        // Enable the controls based on the assigned controls input
+        if (controls != null)
         {
-            Debug.Log(gameObject.name + " cannot move to " + newPositionX);
+            movementActions = controls.FindActionMap("Movement");
         }
-        else
+        //if (lookLeft) ChangeDirection();
+    }
+
+    private void OnEnable()
+    {
+        movementActions.Enable();
+        movementActions["Jump"].started += _ => Jump();
+        movementActions["Attack"].started += _ => Attack();
+    }
+
+    private void OnDisable()
+    {
+        movementActions.Disable();
+        movementActions["Jump"].started -= _ => Jump();
+        movementActions["Attack"].started -= _ => Attack();
+    }
+
+    private void Update()
+    {
+        direction = movementActions["Move"].ReadValue<Vector2>();
+        AdjustRotation(direction.x);
+
+        // Check if the robot is on the floor using an OverlapBox
+        inFloor = Physics2D.OverlapBox(FloorController.position, boxDimensions, 0f, isFloor);
+    }
+
+    private void FixedUpdate()
+    {
+        rb2D.linearVelocity = new Vector2(direction.x * movementVelocity, rb2D.linearVelocity.y);
+    }
+
+
+
+
+    public void AdjustRotation(float directionX)
+    {
+        if (directionX > 0 && !lookLeft)
         {
-            transform.position = new Vector3(newPositionX, transform.position.y, transform.position.z);
-            Debug.Log(gameObject.name + " moved to " + transform.position);
+            ChangeDirection();
+        }
+        else if (directionX < 0 && lookLeft)
+        {
+            ChangeDirection();
         }
     }
 
-    public void Attack()
+    public void ChangeDirection()
     {
-        if (enemyController != null)
+        lookLeft = !lookLeft;
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
+    }
+
+    private void Jump()
+    {
+        if (inFloor)
         {
-            Debug.Log(gameObject.name + " Attacks!");
-            enemyController.TakeDamage(attackDamage);
+            rb2D.AddForce(new Vector2(0, jumpPower), ForceMode2D.Impulse);
+        }
+    }
+
+    private void Attack()
+    {
+        if (weapon != null)
+        {
+            Debug.Log("Bullet fired!");
+            weapon.Fire();
         }
     }
 
     public void TakeDamage(float damage)
     {
         currentHealth = healthBar.getHealth();
-        Debug.Log("Health b4 damage: " + currentHealth);
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);  // Prevents health from going below 0
         healthBar.UpdateHealth(currentHealth);  // Update UI
@@ -72,5 +140,11 @@ public class RobotController : MonoBehaviour
         {
             TakeDamage(100);
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(FloorController.position, boxDimensions);
     }
 }

@@ -3,48 +3,27 @@ using System.Collections;
 
 public class Weapon : MonoBehaviour
 {
-    /*
-    [Header("Projectile Settings")]
-    public GameObject projectilePrefab;
-    public Transform firePoint;
-    */
-    [Header("Sniper Stats")]
-    public float fireRate = 0.2f;          // Time between shots (sniper = slow fire)
-    public float reloadTime = 3f;          // Sniper reload time
-    public int magazineSize = 1;
-    // One bullet per reload (classic sniper)
+    public float fireRate = 0.2f;          // Time between shots
+    public float reloadTime = 3f;          // Reload time
+    public int magazineSize = 1;           // One bullet per reload
     public float damage = 20.0f;
 
-
+    [Header("Bullet Settings")]
     public GameObject bulletPrefab;
+    private float xOffset = 1f;             // Bullet spawn offset from weapon
+
     private int currentAmmo;
     private float nextFireTime = 0f;
     private bool isReloading = false;
-    private float xOffset = 3;
     private Animator animator;
 
-    void Start()
+    private void Start()
     {
+        transform.localRotation = Quaternion.identity;
         currentAmmo = magazineSize;
         animator = GetComponent<Animator>();
     }
 
-    /*
-    public void Fire()
-    {
-        if (isReloading || Time.time < nextFireTime || currentAmmo <= 0)
-            return;
-
-        // Instantiate bullet
-        GameObject bullet = Instantiate(bulletPrefab, transform.position, transform.rotation); currentAmmo--;
-        nextFireTime = Time.time + 1f / fireRate;
-
-        // Auto-reload after firing
-        if (currentAmmo <= 0)
-        {
-            StartCoroutine(Reload());
-        }
-    }*/
     public void Fire()
     {
         if (isReloading)
@@ -62,46 +41,46 @@ public class Weapon : MonoBehaviour
         if (currentAmmo <= 0)
         {
             Debug.Log("Cannot fire: Out of ammo.");
+            StartCoroutine(Reload());
             return;
         }
 
-        // Instantiate bullet
-        Vector3 parentForward = transform.parent.forward;
-        float offset = parentForward.x > 0 ? xOffset : -xOffset; // Decide offset direction based on parent's forward.x component
-        Vector3 firePosition = transform.position + parentForward * xOffset;
+        float direction = transform.parent.localScale.x >= 0 ? 1f : -1f;
+        float offset = xOffset * direction;
+        Vector3 firePosition = transform.position + new Vector3(offset, 0f, 0f);
         GameObject bullet = Instantiate(bulletPrefab, firePosition, transform.rotation);
         Bullet bulletScript = bullet.GetComponent<Bullet>();
+
         if (bulletScript != null)
         {
             bulletScript.setWeapon(this);  // Assuming Bullet script has a method to receive the weapon reference
         }
 
-
         currentAmmo--;
-
         nextFireTime = Time.time + 1f / fireRate;
 
-        // Auto-reload after firing
         if (currentAmmo <= 0)
         {
-            Debug.Log("Ammo empty, starting reload...");
-            //StartCoroutine(Reload());
+            Debug.Log("Ammo empty, reloading...");
+            StartCoroutine(Reload());
         }
     }
-    /*
-    IEnumerator Reload()
+
+    private IEnumerator Reload()
     {
         isReloading = true;
 
-        // Play reload animation if exists
+        // Optional: trigger reload animation
+        /*
         if (animator != null)
         {
-            animator.Play("Reload");
+            animator.SetTrigger("Reload");
         }
-
+        */
         yield return new WaitForSeconds(reloadTime);
 
         currentAmmo = magazineSize;
         isReloading = false;
-    }*/
+        Debug.Log("Reload complete. Ammo restored.");
+    }
 }

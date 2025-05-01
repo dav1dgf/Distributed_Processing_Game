@@ -6,13 +6,14 @@ public class Movement2D_Red : MonoBehaviour
 {
     public ControlsRED controls;
 
+
+    public Weapon weapon;
+
     public Vector2 direction;
 
     public Rigidbody2D rb2D;
 
     public float movementVelocity;
-
-    public Weapon weapon; 
 
     public bool lookRight;
 
@@ -43,14 +44,6 @@ public class Movement2D_Red : MonoBehaviour
         controls.Movement.Attack.started -= _ => Attack(); // New
     }
 
-    private void Attack()
-    {
-        if (weapon != null)
-        {
-            weapon.Fire();
-        }
-    }
-
     private void Update()
     {
         direction = controls.Movement.Move.ReadValue<Vector2>();
@@ -65,11 +58,11 @@ public class Movement2D_Red : MonoBehaviour
     }
     public void AdjustRotation(float directionX)
     {
-        if (directionX > 0 && lookRight)
+        if (directionX > 0 && !lookRight)
         {
             ChangeDirection();
         }
-        else if (directionX < 0 && !lookRight)
+        else if (directionX < 0 && lookRight)
         {
             ChangeDirection();
         }
@@ -94,5 +87,14 @@ public class Movement2D_Red : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(FloorController.position, boxDimensions);
+    }
+
+    private void Attack()
+    {
+        if (weapon != null)
+        {
+            Debug.Log("Bullet fired!");
+            weapon.Fire();
+        }
     }
 }
