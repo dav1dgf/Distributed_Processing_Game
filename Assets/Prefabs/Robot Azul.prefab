@@ -42,7 +42,6 @@ GameObject:
   - component: {fileID: 1288421845343701069}
   - component: {fileID: 3721303434982782731}
   - component: {fileID: 7299195845777415670}
-  - component: {fileID: 8781795499504366273}
   - component: {fileID: 8893794750135244285}
   - component: {fileID: 676986961176045242}
   - component: {fileID: 3959202017608946896}
@@ -137,39 +136,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05a4e972962e70f44a94165f8caa5a42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weapon: {fileID: 0}
+  controls: {fileID: 0}
   moveDistance: 1
+  movementVelocity: 5
+  jumpPower: 10
+  facingRight: 0
+  maxHealth: 100
+  healthBar: {fileID: 0}
   arenaLeftLimit: -5
   arenaRightLimit: 5
   enemyRobot: {fileID: 0}
-  enemyController: {fileID: 0}
-  numActions: 0
-  maxHealth: 100
-  attackDamage: 20
-  healthBar: {fileID: 0}
---- !u!114 &8781795499504366273
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3103687357326091928}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16450d17a83b8844fa45862d8e863327, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weapon: {fileID: 5762423338768106732}
-  direction: {x: 0, y: 0}
-  rb2D: {fileID: 676986961176045242}
-  movementVelocity: 2
-  lookRight: 1
-  jumpPower: 5
+  rb2D: {fileID: 0}
   isFloor:
     serializedVersion: 2
-    m_Bits: 8
-  FloorController: {fileID: 1538809722705806565}
-  boxDimensions: {x: 0.61, y: 0.15, z: 0}
-  inFloor: 0
+    m_Bits: 0
+  FloorController: {fileID: 0}
+  boxDimensions: {x: 0, y: 0, z: 0}
+  startPositionPlayer: {x: 0, y: 0, z: 0}
+  isBlueRobot: 1
 --- !u!61 &8893794750135244285
 BoxCollider2D:
   m_ObjectHideFlags: 0

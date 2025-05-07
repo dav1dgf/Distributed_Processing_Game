@@ -270,7 +270,7 @@ MonoBehaviour:
   moveDistance: 1
   movementVelocity: 5
   jumpPower: 10
-  lookLeft: 0
+  facingRight: 0
   maxHealth: 100
   healthBar: {fileID: 0}
   arenaLeftLimit: -5
@@ -280,8 +280,10 @@ MonoBehaviour:
   isFloor:
     serializedVersion: 2
     m_Bits: 0
-  FloorController: {fileID: 0}
+  FloorController: {fileID: 841065901482767515}
   boxDimensions: {x: 0, y: 0, z: 0}
+  startPositionPlayer: {x: 0, y: 0, z: 0}
+  isBlueRobot: 0
 --- !u!114 &2046096265773935555
 MonoBehaviour:
   m_ObjectHideFlags: 0
