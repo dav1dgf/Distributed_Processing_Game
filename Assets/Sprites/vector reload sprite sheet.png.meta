@@ -1097,7 +1097,46 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      vector reload sprite sheet_0: -4919960319418812662
+      vector reload sprite sheet_1: -8922786344338007479
+      vector reload sprite sheet_10: 1946188305189192901
+      vector reload sprite sheet_11: 955959464442780940
+      vector reload sprite sheet_12: -661461491700764161
+      vector reload sprite sheet_13: 1418397167050174508
+      vector reload sprite sheet_14: -3528616315403125542
+      vector reload sprite sheet_15: -4728342230733125391
+      vector reload sprite sheet_16: 2420277717974127737
+      vector reload sprite sheet_17: -8104633685698700035
+      vector reload sprite sheet_18: -157399057228206027
+      vector reload sprite sheet_19: -5872183103258566499
+      vector reload sprite sheet_2: 8287963081567413196
+      vector reload sprite sheet_20: -8672572387319105396
+      vector reload sprite sheet_21: 2019978526676119655
+      vector reload sprite sheet_22: -4215849773406833409
+      vector reload sprite sheet_23: 7330826915292960625
+      vector reload sprite sheet_24: -1489244882328989684
+      vector reload sprite sheet_25: 7611586511392855631
+      vector reload sprite sheet_26: -6055129595293412979
+      vector reload sprite sheet_27: 7908844566301088259
+      vector reload sprite sheet_28: -4095124515374013260
+      vector reload sprite sheet_29: 866213495092533435
+      vector reload sprite sheet_3: -1312889741948876614
+      vector reload sprite sheet_30: -3322671993691763275
+      vector reload sprite sheet_31: -6186608104152128731
+      vector reload sprite sheet_32: 4685814388550335118
+      vector reload sprite sheet_33: 6463106714508586759
+      vector reload sprite sheet_34: 6393181836497162887
+      vector reload sprite sheet_35: 8565926812476139467
+      vector reload sprite sheet_36: -8455324405086183675
+      vector reload sprite sheet_37: -8936463543376711053
+      vector reload sprite sheet_38: -7202871801561840301
+      vector reload sprite sheet_4: 3697151796664967855
+      vector reload sprite sheet_5: -8405257607944935324
+      vector reload sprite sheet_6: 37815712309154304
+      vector reload sprite sheet_7: -5272563292265578096
+      vector reload sprite sheet_8: -4666378518257609606
+      vector reload sprite sheet_9: 1070970465084609104
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -10,9 +10,9 @@ public class RobotController : MonoBehaviour
     public Weapon weapon;
     public InputActionAsset controls;
     public float moveDistance = 1f;
-    public float movementVelocity = 5f;
-    public float jumpPower = 10f;
-    public bool facingRight;
+    public float movementVelocity = 2f;
+    public float jumpPower = 5f;
+    private bool facingRight;
     public float maxHealth = 100f;
     private float currentHealth;
     public HealthBar healthBar;
@@ -21,7 +21,6 @@ public class RobotController : MonoBehaviour
     public float arenaLeftLimit = -5f;
     public float arenaRightLimit = 5f;
     public Transform enemyRobot;
-    //public RobotController enemyController;
 
     // Physics and Collision
     public Rigidbody2D rb2D;
@@ -33,15 +32,14 @@ public class RobotController : MonoBehaviour
     private bool inFloor;
     private InputActionMap movementActions;
 
+    // Networking
     private TcpClient client;
     private NetworkStream stream;
     private bool gameStarted = false;
-
     public Vector3 startPositionPlayer;
-    public bool isBlueRobot;
-    
-     
-      private async void Start()
+    private Vector3 initialScale;
+
+    private async void Start()
     {
         ConnectToServer();
         await ListenForServerMessages();
@@ -71,22 +69,20 @@ public class RobotController : MonoBehaviour
             }
         }
     }
+
     private void SendToServer(string msg)
     {
         byte[] data = Encoding.ASCII.GetBytes(msg);
         stream.Write(data, 0, data.Length);
     }
-     
-     
+
     private void Awake()
     {
-        // Enable the controls based on the assigned controls input
+        initialScale = transform.localScale;
+        // Encuentra el mapa de acciones "Movement"
+        facingRight = initialScale.x > 0f;
         if (controls != null)
-        {
             movementActions = controls.FindActionMap("Movement");
-        }
-        if (isBlueRobot) facingRight = true; else facingRight = false;
-
 
     }
 
@@ -99,9 +95,9 @@ public class RobotController : MonoBehaviour
 
     private void OnDisable()
     {
-        movementActions.Disable();
         movementActions["Jump"].started -= _ => Jump();
         movementActions["Attack"].started -= _ => Attack();
+        movementActions.Disable();
     }
 
     private void Update()
@@ -109,45 +105,52 @@ public class RobotController : MonoBehaviour
         direction = movementActions["Move"].ReadValue<Vector2>();
         AdjustRotation(direction.x);
 
-        // Check if the robot is on the floor using an OverlapBox
+        // Comprueba si el robot está en el suelo
         inFloor = Physics2D.OverlapBox(FloorController.position, boxDimensions, 0f, isFloor);
     }
 
     private void FixedUpdate()
     {
-        rb2D.linearVelocity = new Vector2(direction.x * movementVelocity, rb2D.linearVelocity.y);
+        rb2D.velocity = new Vector2(direction.x * movementVelocity, rb2D.velocity.y);
     }
-
-
-
 
     public void AdjustRotation(float directionX)
     {
-        if (directionX > 0 && !facingRight)
-        {
-            Flip();
-        }
-        else if (directionX < 0 && facingRight)
-        {
-            Flip();
-        }
+        // Si no hay input horizontal, no hacemos nada
+        if (Mathf.Approximately(directionX, 0f))
+            return;
+
+        // Queremos mirar a la derecha si directionX > 0
+        bool wantRight = directionX > 0f;
+
+        // Lee la rotación actual en Y (0 o 180)
+        float currentY = transform.eulerAngles.y;
+        bool isCurrentlyRight = Mathf.Approximately(currentY, 0f);
+
+        // Si ya estamos bien, salimos
+        if (wantRight == isCurrentlyRight)
+            return;
+
+        // Cambiamos a 0° o 180° en Y
+        float newY = wantRight ? 0f : 180f;
+        transform.rotation = Quaternion.Euler(0f, newY, 0f);
+
+        // Guarda el estado si lo necesitas en 'facingRight'
+        facingRight = wantRight;
     }
 
     public void Flip()
     {
         facingRight = !facingRight;
-        Vector3 scale = transform.localScale;
-        scale.x *= -1;
-        transform.localScale = scale;
+        Vector3 s = transform.localScale;
+        s.x *= -1;
+        transform.localScale = s;
     }
-
 
     private void Jump()
     {
         if (inFloor)
-        {
-            rb2D.AddForce(new Vector2(0, jumpPower), ForceMode2D.Impulse);
-        }
+            rb2D.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
     }
 
     private void Attack()
@@ -161,36 +164,26 @@ public class RobotController : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        currentHealth = healthBar.getHealth();
-        currentHealth -= damage;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);  // Prevents health from going below 0
-        healthBar.UpdateHealth(currentHealth);  // Update UI
+        currentHealth = healthBar.getHealth() - damage;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        healthBar.UpdateHealth(currentHealth);
 
-        Debug.Log(gameObject.name + " took " + damage + " damage! Health: " + currentHealth);
+        Debug.Log($"{gameObject.name} took {damage} damage! Health: {currentHealth}");
 
         if (currentHealth <= 0)
-        {
             Die();
-        }
     }
 
     public void Die()
     {
-        Debug.Log(gameObject.name + " has been destroyed!");
-        gameObject.SetActive(false);  // Disables the robot
+        Debug.Log($"{gameObject.name} has been destroyed!");
+        gameObject.SetActive(false);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        EvaluateCollision(collision.gameObject);
-    }
-
-    public void EvaluateCollision(GameObject collision)
-    {
-        if (collision.CompareTag("Spike"))
-        {
+        if (collision.gameObject.CompareTag("Spike"))
             TakeDamage(100);
-        }
     }
 
     private void OnDrawGizmos()
@@ -199,6 +192,7 @@ public class RobotController : MonoBehaviour
         Gizmos.DrawWireCube(FloorController.position, boxDimensions);
     }
 }
+
 /*
 import socket
 import threading
