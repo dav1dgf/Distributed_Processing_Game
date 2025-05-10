@@ -32,7 +32,7 @@ public class RobotController : MonoBehaviour
     private bool inFloor;
     private InputActionMap movementActions;
 
-    // Networking
+    // Networking (como en clase)
     private TcpClient client;
     private NetworkStream stream;
     private bool gameStarted = false;
@@ -47,8 +47,16 @@ public class RobotController : MonoBehaviour
 
     void ConnectToServer()
     {
-        client = new TcpClient("127.0.0.1", 12345);
-        stream = client.GetStream();
+        try
+        {
+            client = new TcpClient("127.0.0.1", 12345);
+            stream = client.GetStream();
+            Debug.Log("Conectado al servidor.");
+        }
+        catch (SocketException e)
+        {
+            Debug.LogError("No se pudo conectar al servidor: " + e.Message);
+        }
     }
 
     private async Task ListenForServerMessages()
@@ -57,7 +65,11 @@ public class RobotController : MonoBehaviour
         while (true)
         {
             int length = await stream.ReadAsync(buffer, 0, buffer.Length);
-            string msg = Encoding.ASCII.GetString(buffer, 0, length);
+            if (length == 0) continue;
+
+            string msg = Encoding.ASCII.GetString(buffer, 0, length).Trim();
+            Debug.Log("Mensaje del servidor: " + msg);
+
             if (msg == "START")
             {
                 gameStarted = true;
@@ -65,25 +77,28 @@ public class RobotController : MonoBehaviour
             }
             else
             {
-                Debug.Log("Server message: " + msg);
+                // Aquí podrías procesar acciones del otro jugador
+                // Ejemplo: si recibes "2:MOVE LEFT", mover al enemigo
             }
         }
     }
 
     private void SendToServer(string msg)
     {
-        byte[] data = Encoding.ASCII.GetBytes(msg);
-        stream.Write(data, 0, data.Length);
+        if (stream != null && stream.CanWrite)
+        {
+            byte[] data = Encoding.ASCII.GetBytes(msg + "\n");
+            stream.Write(data, 0, data.Length);
+        }
     }
 
     private void Awake()
     {
         initialScale = transform.localScale;
-        // Encuentra el mapa de acciones "Movement"
         facingRight = initialScale.x > 0f;
+
         if (controls != null)
             movementActions = controls.FindActionMap("Movement");
-
     }
 
     private void OnEnable()
@@ -105,6 +120,13 @@ public class RobotController : MonoBehaviour
         direction = movementActions["Move"].ReadValue<Vector2>();
         AdjustRotation(direction.x);
 
+        // Envía al servidor el movimiento si hay input
+        if (Mathf.Abs(direction.x) > 0.1f)
+        {
+            string dir = direction.x > 0 ? "MOVE RIGHT" : "MOVE LEFT";
+            SendToServer(dir);
+        }
+
         // Comprueba si el robot está en el suelo
         inFloor = Physics2D.OverlapBox(FloorController.position, boxDimensions, 0f, isFloor);
     }
@@ -116,41 +138,25 @@ public class RobotController : MonoBehaviour
 
     public void AdjustRotation(float directionX)
     {
-        // Si no hay input horizontal, no hacemos nada
-        if (Mathf.Approximately(directionX, 0f))
-            return;
+        if (Mathf.Approximately(directionX, 0f)) return;
 
-        // Queremos mirar a la derecha si directionX > 0
         bool wantRight = directionX > 0f;
-
-        // Lee la rotación actual en Y (0 o 180)
         float currentY = transform.eulerAngles.y;
         bool isCurrentlyRight = Mathf.Approximately(currentY, 0f);
+        if (wantRight == isCurrentlyRight) return;
 
-        // Si ya estamos bien, salimos
-        if (wantRight == isCurrentlyRight)
-            return;
-
-        // Cambiamos a 0° o 180° en Y
         float newY = wantRight ? 0f : 180f;
         transform.rotation = Quaternion.Euler(0f, newY, 0f);
-
-        // Guarda el estado si lo necesitas en 'facingRight'
         facingRight = wantRight;
-    }
-
-    public void Flip()
-    {
-        facingRight = !facingRight;
-        Vector3 s = transform.localScale;
-        s.x *= -1;
-        transform.localScale = s;
     }
 
     private void Jump()
     {
         if (inFloor)
+        {
             rb2D.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            SendToServer("JUMP");
+        }
     }
 
     private void Attack()
@@ -159,6 +165,7 @@ public class RobotController : MonoBehaviour
         {
             Debug.Log("Bullet fired!");
             weapon.Fire();
+            SendToServer("ATTACK");
         }
     }
 
@@ -192,6 +199,7 @@ public class RobotController : MonoBehaviour
         Gizmos.DrawWireCube(FloorController.position, boxDimensions);
     }
 }
+
 
 /*
 import socket
