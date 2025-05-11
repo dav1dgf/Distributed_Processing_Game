@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
+using System;
 
 public class RobotController : MonoBehaviour
 {
@@ -38,6 +40,7 @@ public class RobotController : MonoBehaviour
     private bool gameStarted = false;
     public Vector3 startPositionPlayer;
     private Vector3 initialScale;
+    private ConcurrentQueue<string> incomingMessages = new ConcurrentQueue<string>();
 
     private async void Start()
     {
@@ -64,22 +67,21 @@ public class RobotController : MonoBehaviour
         byte[] buffer = new byte[1024];
         while (true)
         {
-            int length = await stream.ReadAsync(buffer, 0, buffer.Length);
+            int length;
+            try
+            {
+                length = await stream.ReadAsync(buffer, 0, buffer.Length);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Red caída: " + e);
+                break;
+            }
             if (length == 0) continue;
 
             string msg = Encoding.ASCII.GetString(buffer, 0, length).Trim();
-            Debug.Log("Mensaje del servidor: " + msg);
 
-            if (msg == "START")
-            {
-                gameStarted = true;
-                transform.position = startPositionPlayer;
-            }
-            else
-            {
-                // Aquí podrías procesar acciones del otro jugador
-                // Ejemplo: si recibes "2:MOVE LEFT", mover al enemigo
-            }
+            incomingMessages.Enqueue(msg);
         }
     }
 
@@ -90,6 +92,27 @@ public class RobotController : MonoBehaviour
             byte[] data = Encoding.ASCII.GetBytes(msg + "\n");
             stream.Write(data, 0, data.Length);
         }
+    }
+
+    private void HandleServerMessage(string msg)
+    {
+        Debug.Log("Servidor dijo: " + msg);
+        if (msg == "START")
+        {
+            gameStarted = true;
+            transform.position = startPositionPlayer;
+        }
+        else if (msg.StartsWith("2:MOVE "))
+        {
+            // Por ejemplo: "2:MOVE LEFT"
+            var parts = msg.Split(' ');
+            if (parts.Length == 2 && enemyRobot != null)
+            {
+                if (parts[1] == "LEFT") enemyRobot.Translate(Vector2.left * movementVelocity * Time.deltaTime);
+                if (parts[1] == "RIGHT") enemyRobot.Translate(Vector2.right * movementVelocity * Time.deltaTime);
+            }
+        }
+        // …otros comandos…
     }
 
     private void Awake()
@@ -117,6 +140,12 @@ public class RobotController : MonoBehaviour
 
     private void Update()
     {
+        // 1) Procesa todos los mensajes de red recibidos
+        while (incomingMessages.TryDequeue(out var msg))
+            HandleServerMessage(msg);
+
+        // 2) El código de lectura de input y OverlapBox… (falta por hacer aun)
+        direction = movementActions["Move"].ReadValue<Vector2>();
         direction = movementActions["Move"].ReadValue<Vector2>();
         AdjustRotation(direction.x);
 
