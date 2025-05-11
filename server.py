@@ -1,61 +1,63 @@
+
 import socket
 import threading
+import time
 
-PORT = 12345
-MAX_CLIENTS = 2
-client_sockets = []
+players = {}
 lock = threading.Lock()
+turn_index = 0
+turn_duration = 3  # segundos
+MAX_PLAYERS = 2
 
-def handle_client(sock, client_id):
+def handle_client(conn, addr, player_id):
+    global turn_index
+    conn.sendall(f"WELCOME {player_id}\n".encode())
+    while len(players) < MAX_PLAYERS:
+        time.sleep(0.5)
+
+    conn.sendall(f"START map1 your_turn:{{'yes' if player_id == turn_index else 'no'}}\n".encode())
+
     while True:
         try:
-            data = sock.recv(1024)
+            data = conn.recv(1024).decode().strip()
             if not data:
                 break
+            print(f"[Jugador {player_id}] → {data}")
 
-            with lock:
-                # Send the message to the other client
-                for i, other_sock in enumerate(client_sockets):
-                    if other_sock != sock:
-                        try:
-                            other_sock.sendall(data)
-                        except:
-                            pass
-        except:
+            if player_id == turn_index:
+                if data.startswith("MOVE") or data.startswith("JUMP") or data.startswith("CLIMB"):
+                    response = f"UPDATE move registered: {data}\n"
+                    conn.sendall(response.encode())
+                elif data.startswith("ATTACK"):
+                    response = f"HIT {{(player_id+1)%2}} vida_actual:90\n"
+                    conn.sendall(response.encode())
+                    with lock:
+                        turn_index = (turn_index + 1) % MAX_PLAYERS
+                    conn.sendall("ENDTURN\n".encode())
+                    time.sleep(0.5)
+                    players[turn_index].sendall("YOURTURN 3\n".encode())
+        except Exception as e:
+            print(f"Error: {e}")
             break
 
-    print(f"Client {client_id} disconnected.")
-    sock.close()
+    conn.close()
 
-def main():
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('', PORT))
-    server_socket.listen(MAX_CLIENTS)
-    print(f"Server listening on port {PORT}")
+def start_server():
+    HOST = '127.0.0.1'
+    PORT = 65432
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind((HOST, PORT))
+    server.listen()
 
-    while len(client_sockets) < MAX_CLIENTS:
-        client_sock, addr = server_socket.accept()
-        with lock:
-            client_sockets.append(client_sock)
-        print(f"Player {len(client_sockets)} connected from {addr}")
+    print(f"[SERVIDOR] Esperando conexiones en {HOST}:{PORT}...")
+    player_id = 0
 
-    # Send START to all clients
-    for sock in client_sockets:
-        sock.sendall(b'START')
-
-    # Create threads for each client
-    for i, sock in enumerate(client_sockets):
-        thread = threading.Thread(target=handle_client, args=(sock, i+1), daemon=True)
+    while player_id < MAX_PLAYERS:
+        conn, addr = server.accept()
+        print(f"[CONECTADO] Jugador {player_id} desde {addr}")
+        players[player_id] = conn
+        thread = threading.Thread(target=handle_client, args=(conn, addr, player_id))
         thread.start()
+        player_id += 1
 
-    try:
-        while True:
-            pass  # Keep the server running
-    except KeyboardInterrupt:
-        print("Server shutting down.")
-        for sock in client_sockets:
-            sock.close()
-        server_socket.close()
-
-if __name__ == '__main__':
-    main()
+start_server()
