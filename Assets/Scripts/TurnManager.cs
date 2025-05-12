@@ -69,8 +69,8 @@ public class TurnManager : MonoBehaviour
     }
     public void StartTurn(Vector2 enemyPos, float health)
     {
+        GameObject enemyRobot = networkManager.playerId == 0 ? Robot2 : Robot1;
         if (enemyPos != null && health!= null) { 
-            GameObject enemyRobot= networkManager.playerId == 0? Robot2 : Robot1;
             GameObject friendRobot = networkManager.playerId == 0 ? Robot1 : Robot2;
             enemyRobot.transform.position = enemyPos;
             friendRobot.GetComponent<RobotController>().TakeDamage(friendRobot.GetComponent<RobotController>().currentHealth - health);
@@ -86,6 +86,10 @@ public class TurnManager : MonoBehaviour
         // Stop movement of the robot not in turn
         Rigidbody2D rb1 = Robot1.GetComponent<Rigidbody2D>();
         Rigidbody2D rb2 = Robot2.GetComponent<Rigidbody2D>();
+        //NOT OPTIMAL (CHANGE)
+
+
+        enemyRobot.GetComponent<RobotController>().enabled = false;
 
         if (!isBlueTurn && rb1 != null)
         {

@@ -1,7 +1,8 @@
 import socket
 import threading
 import time
-import random
+import signal
+import sys
 
 players = {}
 lock = threading.Lock()
@@ -9,26 +10,25 @@ turn_index = 0
 turn_duration = 3  # segundos
 MAX_PLAYERS = 2
 start_barrier = threading.Barrier(2)  # Wait for 2 threads (players)
-# Información ficticia de robots (ejemplo)
 player_data = {0: {"position": (0, 0), "health": 100}, 1: {"position": (10, 10), "health": 100}}
+
+server_socket = None  # Para cerrarlo desde el manejador de señal
 
 def handle_client(conn, addr, player_id):
     global turn_index
-    #conn.sendall(f"{player_id}\n".encode())
     other_player_id = (player_id + 1) % MAX_PLAYERS
 
-    # Esperar hasta que haya 2 jugadores conectados
     while len(players) < MAX_PLAYERS:
         time.sleep(0.5)
 
-    conn.sendall(f"{player_id}".encode())
-    start_barrier.wait()
-    time.sleep(1)
-    print("Sending START...")
-    conn.sendall("START\n".encode())
+    try:
+        conn.sendall(f"{player_id}".encode())
+        start_barrier.wait()
+        time.sleep(1)
+        print("Sending START...")
+        conn.sendall("START\n".encode())
 
-    while True:
-        try:
+        while True:
             data = conn.recv(1024).decode().strip()
             if not data:
                 break
@@ -36,8 +36,6 @@ def handle_client(conn, addr, player_id):
             start_barrier.wait()
             parts = data.split()
             if len(parts) == 4 and parts[0] == "DATA":
-                #Lock not really needed
-                
                 x = float(parts[1].replace(',', '.'))
                 y = float(parts[2].replace(',', '.'))
                 health = float(parts[3])
@@ -53,11 +51,9 @@ def handle_client(conn, addr, player_id):
                         rival_position = player_data[player_id]["position"]
                         own_health = player_data[other_player_id]["health"]
                         other_conn.sendall(f"DATA {rival_position[0]} {rival_position[1]} {own_health}\n".encode())
-                        
-                        
                     except Exception as e:
                         print(f"Error enviando al jugador {other_player_id}: {e}")
-                start_barrier.wait()#wait till both sent message
+                start_barrier.wait()
                 time.sleep(4)
                 print("Sending TURN...")
                 conn.sendall("TURN\n".encode())
@@ -66,33 +62,51 @@ def handle_client(conn, addr, player_id):
                 with lock:
                     players.pop(player_id, None)
                 break
-
             else:
                 print(f"Datos incorrectos recibidos: {data}")
-        except Exception as e:
-            print(f"Error con el jugador {player_id}: {e}")
-            break
+    except Exception as e:
+        print(f"Error con el jugador {player_id}: {e}")
+    finally:
+        conn.close()
 
-    conn.close()
-
-
+def shutdown_server(signum=None, frame=None):
+    global server_socket
+    print("\n[SERVIDOR] Apagando servidor...")
+    if server_socket:
+        server_socket.close()
+    with lock:
+        for pid, conn in players.items():
+            try:
+                conn.sendall("DISCONNECT\n".encode())
+                conn.close()
+            except:
+                pass
+        players.clear()
+    sys.exit(0)
 
 def start_server():
+    global server_socket
     HOST = '127.0.0.1'
     PORT = 65432
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((HOST, PORT))
-    server.listen()
-
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((HOST, PORT))
+    server_socket.listen()
     print(f"[SERVIDOR] Esperando conexiones en {HOST}:{PORT}...")
+
+    signal.signal(signal.SIGINT, shutdown_server)
+
     player_id = 0
-
     while player_id < MAX_PLAYERS:
-        conn, addr = server.accept()
-        print(f"[CONECTADO] Jugador {player_id} desde {addr}")
-        players[player_id] = conn
-        thread = threading.Thread(target=handle_client, args=(conn, addr, player_id))
-        thread.start()
-        player_id += 1
+        try:
+            conn, addr = server_socket.accept()
+            print(f"[CONECTADO] Jugador {player_id} desde {addr}")
+            players[player_id] = conn
+            thread = threading.Thread(target=handle_client, args=(conn, addr, player_id))
+            thread.start()
+            player_id += 1
+        except OSError:
+            # El socket fue cerrado manualmente (por Ctrl+C)
+            break
 
-start_server()
+if __name__ == '__main__':
+    start_server()
