@@ -8,10 +8,25 @@ public class TurnManager : MonoBehaviour
     public GameObject Robot2;
     public bool isBlueTurn = true;
     public TMP_Text text;
+    [SerializeField] private NetworkManager networkManager;
+    private bool gameStarted = false;
 
-    private void Start()
+    public void StartGame()
     {
+
+        Robot1.GetComponent<RobotController>().StartGame();
+        Robot2.GetComponent<RobotController>().StartGame();
+
+        gameStarted = true;
         StartCoroutine(HandleTurn());
+        if (networkManager != null)
+        {
+            if (networkManager.playerId == 0)  // Robot1 is controlled by player 0
+                networkManager.SendPlayerInfoToServer(pos1.x, pos1.y, health2);  // Send enemy health (Robot2)
+            else
+                networkManager.SendPlayerInfoToServer(pos2.x, pos2.y, health1);  // Send enemy health (Robot1)
+        }
+
     }
 
     IEnumerator HandleTurn()
@@ -33,8 +48,8 @@ public class TurnManager : MonoBehaviour
             if (!isBlueTurn && rb1 != null)
             {
                 rb1.linearVelocity = Vector2.zero;
-                rb1.gravityScale = 0f;
-                rb2.gravityScale = 1f;
+                rb1.bodyType = RigidbodyType2D.Kinematic;
+                rb2.bodyType = RigidbodyType2D.Dynamic;
 
 
 
@@ -42,29 +57,62 @@ public class TurnManager : MonoBehaviour
             else if (isBlueTurn && rb2 != null)
             {
                 rb2.linearVelocity = Vector2.zero;
-                rb2.gravityScale = 0f;
-                rb1.gravityScale = 1f;
+                rb2.bodyType = RigidbodyType2D.Kinematic;
+                rb1.bodyType = RigidbodyType2D.Dynamic;
+
             }
 
             //rb2.gravityScale = isBlueTurn ? 0f : 1f;
 
 
 
-            // Wait 3 seconds during this turn
-            yield return new WaitForSeconds(4f);
-
-            EndTurn();
+            
         }
     }
 
-    void checkGameEnd()
+    public void GameEnd(string loser)
     {
-        // Check for victory
-        
+        // Stop the turn coroutine
+        StopAllCoroutines();
+
+        // Disable both robot controllers
+        Robot1.GetComponent<RobotController>().enabled = false;
+        Robot2.GetComponent<RobotController>().enabled = false;
+
+        // Show winner text
+        string winner = loser == "Red Robot" ? "Blue Robot" : "Red Robot";
+        text.text = $"{winner} wins!";
+        Debug.Log($"{winner} wins!");
+        if (networkManager != null)
+        {
+            networkManager.EndGame();
+        }
+        // Optional: Call another method or open a UI to restart or go to menu
     }
 
     void EndTurn()
     {
         isBlueTurn = !isBlueTurn;
+
+        // Get positions
+        Vector2 pos1 = Robot1.transform.position;
+        Vector2 pos2 = Robot2.transform.position;
+
+        // Get health (assuming your RobotController has a public int Health)
+        float health1 = Robot1.GetComponent<RobotController>().currentHealth;
+        float health2 = Robot2.GetComponent<RobotController>().currentHealth;
+
+        Debug.Log($"[EndTurn] Robot1 at {pos1}, Health: {health1}");
+        Debug.Log($"[EndTurn] Robot2 at {pos2}, Health: {health2}");
+
+        // Send data to server using NetworkManager
+        if (networkManager != null)
+        {
+            if (networkManager.playerId == 0)  // Robot1 is controlled by player 0
+                networkManager.SendPlayerInfoToServer(pos1.x, pos1.y, health2);  // Send enemy health (Robot2)
+            else
+                networkManager.SendPlayerInfoToServer(pos2.x, pos2.y, health1);  // Send enemy health (Robot1)
+        }
     }
+
 }

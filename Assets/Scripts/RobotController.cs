@@ -33,6 +33,8 @@ public class RobotController : MonoBehaviour
     private Vector2 direction;
     private bool inFloor;
     private InputActionMap movementActions;
+    //public GameObject GameManager;
+    public TurnManager turnManager;
 
     // Networking (como en clase)
  
@@ -40,13 +42,33 @@ public class RobotController : MonoBehaviour
     public Vector3 startPositionPlayer;
     private Vector3 initialScale;
 
-    
+    public void StartGame()
+    {
+        gameStarted = true;
+
+        // Reset health
+        currentHealth = maxHealth;
+        healthBar.UpdateHealth(currentHealth);
+
+        // Reset position, scale, and rotation
+        transform.position = startPositionPlayer;
+        transform.localScale = initialScale;
+        // Optionally reset any velocity if using Rigidbody
+        var rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
+
+        Debug.Log("Game started. Player reset.");
+    }
 
     private void Awake()
     {
         initialScale = transform.localScale;
         facingRight = initialScale.x > 0f;
-
+        //turnManager = GameManager.GetComponent<TurnManager>();
         if (controls != null)
             movementActions = controls.FindActionMap("Movement");
     }
@@ -130,14 +152,15 @@ public class RobotController : MonoBehaviour
 
         Debug.Log($"{gameObject.name} took {damage} damage! Health: {currentHealth}");
 
-        if (currentHealth <= 0)
+        if (currentHealth <= 0 && gameStarted)
             Die();
     }
 
     public void Die()
     {
         Debug.Log($"{gameObject.name} has been destroyed!");
-        gameObject.SetActive(false);
+        turnManager.GameEnd(gameObject.name);
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

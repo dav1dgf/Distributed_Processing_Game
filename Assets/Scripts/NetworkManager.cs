@@ -14,31 +14,38 @@ public class NetworkManager : MonoBehaviour
     private bool gameStarted = false;
 
     // Para almacenar la información de los jugadores
-    private int playerId;
+    public int playerId;
     private Vector2 playerPosition;
     private int playerHealth;
     private Vector2 enemyPosition;
     private int enemyHealth;
     public TMP_Text text;
+    [SerializeField] private TurnManager turnManager;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private async void Start()
     {
-        ConnectToServer();
+        await TryConnectToServerRepeatedly();
         await ListenForServerMessages();
     }
 
-    void ConnectToServer()
+    private async Task TryConnectToServerRepeatedly()
     {
-        try
+        while (client == null || !client.Connected)
         {
-            client = new TcpClient("127.0.0.1", 65432);  // Asegúrate de que el puerto coincida con el servidor
-            stream = client.GetStream();
-            Debug.Log("Conectado al servidor.");
-        }
-        catch (SocketException e)
-        {
-            Debug.LogError("No se pudo conectar al servidor: " + e.Message);
+            try
+            {
+                client = new TcpClient();
+                await client.ConnectAsync("127.0.0.1", 65432);
+                stream = client.GetStream();
+                Debug.Log("Conectado al servidor.");
+                text.text = "Connected, waiting 4 player...";
+            }
+            catch (SocketException e)
+            {
+               // Debug.LogWarning("No se pudo conectar al servidor. Reintentando en 0.5s...");
+                await Task.Delay(500);
+            }
         }
     }
 
@@ -68,7 +75,7 @@ public class NetworkManager : MonoBehaviour
     {
         Debug.Log("Servidor dijo: " + msg);
 
-        
+
         if (msg == "0" || msg == "1")
         {
             gameStarted = true;
@@ -77,43 +84,78 @@ public class NetworkManager : MonoBehaviour
             Debug.Log($"Eres el Jugador {playerId}");
             text.text = $"Eres el Jugador {playerId}";
         }
+        else if (msg == "START")
+        {
+            turnManager.StartGame();
+            text.text = "";
+            
+        }
+        else if (msg == "TURN")
+        {
+            turnManager.EndTurn();
+            text.text = "";
+
+        }
         else if (msg.StartsWith("DATA"))
         {
-            // El servidor envía la información de la posición y la vida del otro jugador
             var parts = msg.Split(' ');
             if (parts.Length == 4)
             {
-                enemyPosition = new Vector2(float.Parse(parts[1]), float.Parse(parts[2]));
-                enemyHealth = int.Parse(parts[3]);
-                Debug.Log($"Posición del enemigo: {enemyPosition}, Salud del enemigo: {enemyHealth}");
-            }
-        }
-        
-        // Aquí podrías agregar más comandos para otras acciones como "MOVE", "JUMP", etc.
-    }
-
-    private void Update()
-    {
-        // Si el juego ha comenzado y estamos en nuestro turno, procesamos las entradas
-        if (gameStarted)
-        {
-            if (playerId == 0) // Si eres el jugador 0
-            {
-                // Movimiento simple con teclas para pruebas
-                float moveX = Input.GetAxis("Horizontal");
-                float moveY = Input.GetAxis("Vertical");
-
-                // Enviar la posición y la vida al servidor cada vez que se mueva
-                SendPlayerInfoToServer(playerPosition.x, playerPosition.y, playerHealth);
+                if (float.TryParse(parts[1], out float x) &&
+                    float.TryParse(parts[2], out float y) &&
+                    float.TryParse(parts[3].Replace(",", "."), out float health))
+                {
+                    enemyPosition = new Vector2(x, y);
+                    enemyHealth = Mathf.RoundToInt(health);
+                    Debug.Log($"Posición del enemigo: {enemyPosition}, Salud del enemigo: {enemyHealth}");
+                }
+                else
+                {
+                    Debug.LogWarning("Error al parsear los datos del enemigo.");
+                }
             }
         }
     }
 
-    private void SendPlayerInfoToServer(float x, float y, int health)
+
+
+        public void SendPlayerInfoToServer(float x, float y, float health)
     {
-        string msg = $"{x} {y} {health}";
+        string msg = $"DATA {x} {y} {health}";
+
         SendToServer(msg);
     }
+
+    public void EndGame()
+    {
+        Debug.Log("Desconectando del servidor...");
+
+        try
+        {
+            // Enviar un mensaje de desconexión al servidor (opcional)
+            SendToServer("DISCONNECT");
+
+            // Cerrar stream y conexión
+            if (stream != null)
+            {
+                stream.Close();
+                stream = null;
+            }
+
+            if (client != null)
+            {
+                client.Close();
+                client = null;
+            }
+
+            Debug.Log("Conexión cerrada.");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error al cerrar la conexión: " + e.Message);
+        }
+    }
+
 
     private void SendToServer(string msg)
     {
@@ -121,7 +163,9 @@ public class NetworkManager : MonoBehaviour
         {
             byte[] data = Encoding.ASCII.GetBytes(msg + "\n");
             stream.Write(data, 0, data.Length);
+            Debug.Log($"Enviado a server: {msg}");
         }
+
     }
 
     private void OnApplicationQuit()
