@@ -18,7 +18,6 @@ public class NetworkManager : MonoBehaviour
     private Vector2 playerPosition;
     private int playerHealth;
     private Vector2 enemyPosition;
-    private int enemyHealth;
     public TMP_Text text;
     [SerializeField] private TurnManager turnManager;
 
@@ -87,13 +86,14 @@ public class NetworkManager : MonoBehaviour
         else if (msg == "START")
         {
             turnManager.StartGame();
+            Debug.Log($"Server start");
             text.text = "";
             
         }
-        else if (msg == "TURN")
+        else if (msg.StartsWith("TURN"))
         {
             turnManager.EndTurn();
-            text.text = "";
+           // text.text = "";
 
         }
         else if (msg.StartsWith("DATA"))
@@ -101,13 +101,14 @@ public class NetworkManager : MonoBehaviour
             var parts = msg.Split(' ');
             if (parts.Length == 4)
             {
-                if (float.TryParse(parts[1], out float x) &&
-                    float.TryParse(parts[2], out float y) &&
-                    float.TryParse(parts[3].Replace(",", "."), out float health))
+                if (float.TryParse(parts[1].Replace(".", ","), out float x) &&
+                    float.TryParse(parts[2].Replace(".", ","), out float y) &&
+                    float.TryParse(parts[3].Replace(".", ","), out float health))
                 {
                     enemyPosition = new Vector2(x, y);
-                    enemyHealth = Mathf.RoundToInt(health);
-                    Debug.Log($"Posición del enemigo: {enemyPosition}, Salud del enemigo: {enemyHealth}");
+                    float myHealth = Mathf.RoundToInt(health);
+                    Debug.Log($"Posición del enemigo: {enemyPosition}, Salud del enemigo: {myHealth}");
+                    turnManager.StartTurn(enemyPosition, myHealth);
                 }
                 else
                 {

@@ -535,6 +535,7 @@ MonoBehaviour:
   Robot2: {fileID: 1349756553}
   isBlueTurn: 1
   text: {fileID: 1175158846}
+  networkManager: {fileID: 2054395508}
 --- !u!1 &299720964 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3103687357326091928, guid: 3bf3ccb0719d17e4daefa0ed86305065, type: 3}
@@ -5299,11 +5300,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5751951985537815767, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: startPositionPlayer.x
-      value: 2
+      value: -2.59
       objectReference: {fileID: 0}
     - target: {fileID: 5751951985537815767, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: startPositionPlayer.y
-      value: 1.81
+      value: -1.84
       objectReference: {fileID: 0}
     - target: {fileID: 6215564675699699139, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: jumpPower
@@ -5401,7 +5402,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e032d4473108b244cbdad860b0ec85c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerId: 0
   text: {fileID: 649413982}
+  turnManager: {fileID: 261344651}
 --- !u!4 &2054395509
 Transform:
   m_ObjectHideFlags: 0

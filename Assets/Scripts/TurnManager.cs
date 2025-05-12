@@ -11,14 +11,31 @@ public class TurnManager : MonoBehaviour
     [SerializeField] private NetworkManager networkManager;
     private bool gameStarted = false;
 
+    public void Start()
+    {
+
+    }
+    public void Update()
+    {
+
+    }
     public void StartGame()
     {
 
         Robot1.GetComponent<RobotController>().StartGame();
         Robot2.GetComponent<RobotController>().StartGame();
-
+        GameObject enemyRobot = networkManager.playerId == 0 ? Robot2 : Robot1;
+        Vector2 pos1 = Robot1.transform.position;
+        Vector2 pos2 = Robot2.transform.position;
         gameStarted = true;
-        StartCoroutine(HandleTurn());
+        StartTurn(enemyRobot.transform.position, 100);
+
+        
+
+        // Get health (assuming your RobotController has a public int Health)
+        float health1 = Robot1.GetComponent<RobotController>().currentHealth;
+        float health2 = Robot2.GetComponent<RobotController>().currentHealth;
+
         if (networkManager != null)
         {
             if (networkManager.playerId == 0)  // Robot1 is controlled by player 0
@@ -29,46 +46,7 @@ public class TurnManager : MonoBehaviour
 
     }
 
-    IEnumerator HandleTurn()
-    {
-        while (true)
-        {
-            string currentRobot = isBlueTurn ? "Robot1" : "Robot2";
-            Debug.Log($"{currentRobot}'s turn!");
-            text.text = currentRobot + " turn!";
-
-            // Enable movement for the current player, disable for the other
-            Robot1.GetComponent<RobotController>().enabled = isBlueTurn;
-            Robot2.GetComponent<RobotController>().enabled = !isBlueTurn;
-
-            // Stop movement of the robot not in turn
-            Rigidbody2D rb1 = Robot1.GetComponent<Rigidbody2D>();
-            Rigidbody2D rb2 = Robot2.GetComponent<Rigidbody2D>();
-
-            if (!isBlueTurn && rb1 != null)
-            {
-                rb1.linearVelocity = Vector2.zero;
-                rb1.bodyType = RigidbodyType2D.Kinematic;
-                rb2.bodyType = RigidbodyType2D.Dynamic;
-
-
-
-            }
-            else if (isBlueTurn && rb2 != null)
-            {
-                rb2.linearVelocity = Vector2.zero;
-                rb2.bodyType = RigidbodyType2D.Kinematic;
-                rb1.bodyType = RigidbodyType2D.Dynamic;
-
-            }
-
-            //rb2.gravityScale = isBlueTurn ? 0f : 1f;
-
-
-
-            
-        }
-    }
+  
 
     public void GameEnd(string loser)
     {
@@ -89,8 +67,45 @@ public class TurnManager : MonoBehaviour
         }
         // Optional: Call another method or open a UI to restart or go to menu
     }
+    public void StartTurn(Vector2 enemyPos, float health)
+    {
+        if (enemyPos != null && health!= null) { 
+            GameObject enemyRobot= networkManager.playerId == 0? Robot2 : Robot1;
+            GameObject friendRobot = networkManager.playerId == 0 ? Robot1 : Robot2;
+            enemyRobot.transform.position = enemyPos;
+            friendRobot.GetComponent<RobotController>().TakeDamage(friendRobot.GetComponent<RobotController>().currentHealth - health);
+        }
+        string currentRobot = isBlueTurn ? "Robot1" : "Robot2";
+        Debug.Log($"{currentRobot}'s turn!");
+        text.text = currentRobot + " turn!";
 
-    void EndTurn()
+        // Enable movement for the current player, disable for the other
+        Robot1.GetComponent<RobotController>().enabled = isBlueTurn;
+        Robot2.GetComponent<RobotController>().enabled = !isBlueTurn;
+
+        // Stop movement of the robot not in turn
+        Rigidbody2D rb1 = Robot1.GetComponent<Rigidbody2D>();
+        Rigidbody2D rb2 = Robot2.GetComponent<Rigidbody2D>();
+
+        if (!isBlueTurn && rb1 != null)
+        {
+            rb1.linearVelocity = Vector2.zero;
+            rb1.bodyType = RigidbodyType2D.Kinematic;
+            rb2.bodyType = RigidbodyType2D.Dynamic;
+
+
+
+        }
+        else if (isBlueTurn && rb2 != null)
+        {
+            rb2.linearVelocity = Vector2.zero;
+            rb2.bodyType = RigidbodyType2D.Kinematic;
+            rb1.bodyType = RigidbodyType2D.Dynamic;
+
+        }
+    }
+
+    public void EndTurn()
     {
         isBlueTurn = !isBlueTurn;
 
@@ -113,6 +128,7 @@ public class TurnManager : MonoBehaviour
             else
                 networkManager.SendPlayerInfoToServer(pos2.x, pos2.y, health1);  // Send enemy health (Robot1)
         }
+        //StartTurn();
     }
 
 }

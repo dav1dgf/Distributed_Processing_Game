@@ -24,7 +24,8 @@ def handle_client(conn, addr, player_id):
     conn.sendall(f"{player_id}".encode())
     start_barrier.wait()
     time.sleep(1)
-    conn.sendall("START".encode())
+    print("Sending START...")
+    conn.sendall("START\n".encode())
 
     while True:
         try:
@@ -58,7 +59,8 @@ def handle_client(conn, addr, player_id):
                         print(f"Error enviando al jugador {other_player_id}: {e}")
                 start_barrier.wait()#wait till both sent message
                 time.sleep(4)
-                conn.sendall("TURN".encode())
+                print("Sending TURN...")
+                conn.sendall("TURN\n".encode())
             elif data == "DISCONNECT":
                 print(f"[Jugador {player_id}] solicitó desconexión.")
                 with lock:
