@@ -15,8 +15,8 @@ public class RobotController : MonoBehaviour
     public float movementVelocity = 2f;
     public float jumpPower = 5f;
     private bool facingRight;
-    public float maxHealth = 100f;
-    private float currentHealth;
+    private float maxHealth = 100f;
+    public float currentHealth = 100f;
     public HealthBar healthBar;
 
     // Arena boundaries and enemy robot
@@ -35,85 +35,12 @@ public class RobotController : MonoBehaviour
     private InputActionMap movementActions;
 
     // Networking (como en clase)
-    private TcpClient client;
-    private NetworkStream stream;
+ 
     private bool gameStarted = false;
     public Vector3 startPositionPlayer;
     private Vector3 initialScale;
-    private ConcurrentQueue<string> incomingMessages = new ConcurrentQueue<string>();
 
-    private async void Start()
-    {
-        ConnectToServer();
-        await ListenForServerMessages();
-    }
-
-    void ConnectToServer()
-    {
-        try
-        {
-            client = new TcpClient("127.0.0.1", 12345);
-            stream = client.GetStream();
-            Debug.Log("Conectado al servidor.");
-        }
-        catch (SocketException e)
-        {
-            Debug.LogError("No se pudo conectar al servidor: " + e.Message);
-        }
-    }
-
-    private async Task ListenForServerMessages()
-    {
-        byte[] buffer = new byte[1024];
-        while (true)
-        {
-            int length;
-            try
-            {
-                length = await stream.ReadAsync(buffer, 0, buffer.Length);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("Red caída: " + e);
-                break;
-            }
-            if (length == 0) continue;
-
-            string msg = Encoding.ASCII.GetString(buffer, 0, length).Trim();
-
-            incomingMessages.Enqueue(msg);
-        }
-    }
-
-    private void SendToServer(string msg)
-    {
-        if (stream != null && stream.CanWrite)
-        {
-            byte[] data = Encoding.ASCII.GetBytes(msg + "\n");
-            stream.Write(data, 0, data.Length);
-        }
-    }
-
-    private void HandleServerMessage(string msg)
-    {
-        Debug.Log("Servidor dijo: " + msg);
-        if (msg == "START")
-        {
-            gameStarted = true;
-            transform.position = startPositionPlayer;
-        }
-        else if (msg.StartsWith("2:MOVE "))
-        {
-            // Por ejemplo: "2:MOVE LEFT"
-            var parts = msg.Split(' ');
-            if (parts.Length == 2 && enemyRobot != null)
-            {
-                if (parts[1] == "LEFT") enemyRobot.Translate(Vector2.left * movementVelocity * Time.deltaTime);
-                if (parts[1] == "RIGHT") enemyRobot.Translate(Vector2.right * movementVelocity * Time.deltaTime);
-            }
-        }
-        // …otros comandos…
-    }
+    
 
     private void Awake()
     {
@@ -140,29 +67,27 @@ public class RobotController : MonoBehaviour
 
     private void Update()
     {
-        // 1) Procesa todos los mensajes de red recibidos
-        while (incomingMessages.TryDequeue(out var msg))
-            HandleServerMessage(msg);
+        
 
-        // 2) El código de lectura de input y OverlapBox… (falta por hacer aun)
+        // 2) El cï¿½digo de lectura de input y OverlapBoxï¿½ (falta por hacer aun)
         direction = movementActions["Move"].ReadValue<Vector2>();
         direction = movementActions["Move"].ReadValue<Vector2>();
         AdjustRotation(direction.x);
 
-        // Envía al servidor el movimiento si hay input
+        // Envï¿½a al servidor el movimiento si hay input
         if (Mathf.Abs(direction.x) > 0.1f)
         {
             string dir = direction.x > 0 ? "MOVE RIGHT" : "MOVE LEFT";
-            SendToServer(dir);
+            //SendToServer(dir);
         }
 
-        // Comprueba si el robot está en el suelo
+        // Comprueba si el robot estï¿½ en el suelo
         inFloor = Physics2D.OverlapBox(FloorController.position, boxDimensions, 0f, isFloor);
     }
 
     private void FixedUpdate()
     {
-        rb2D.velocity = new Vector2(direction.x * movementVelocity, rb2D.velocity.y);
+        rb2D.linearVelocity = new Vector2(direction.x * movementVelocity, rb2D.linearVelocity.y);
     }
 
     public void AdjustRotation(float directionX)
@@ -184,7 +109,6 @@ public class RobotController : MonoBehaviour
         if (inFloor)
         {
             rb2D.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
-            SendToServer("JUMP");
         }
     }
 
@@ -194,7 +118,7 @@ public class RobotController : MonoBehaviour
         {
             Debug.Log("Bullet fired!");
             weapon.Fire();
-            SendToServer("ATTACK");
+            
         }
     }
 

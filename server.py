@@ -1,7 +1,7 @@
-
 import socket
 import threading
 import time
+import random
 
 players = {}
 lock = threading.Lock()
@@ -9,38 +9,66 @@ turn_index = 0
 turn_duration = 3  # segundos
 MAX_PLAYERS = 2
 
+# Información ficticia de robots (ejemplo)
+player_data = {0: {"position": (0, 0), "health": 100}, 1: {"position": (10, 10), "health": 100}}
+
 def handle_client(conn, addr, player_id):
     global turn_index
-    conn.sendall(f"WELCOME {player_id}\n".encode())
+    conn.sendall(f"{player_id}\n".encode())  # Enviar el ID del jugador (0 o 1) al cliente
+    other_player_id = (player_id + 1) % MAX_PLAYERS
+
+    # Esperar hasta que haya 2 jugadores conectados
     while len(players) < MAX_PLAYERS:
         time.sleep(0.5)
 
-    conn.sendall(f"START map1 your_turn:{{'yes' if player_id == turn_index else 'no'}}\n".encode())
+    # Informar a los clientes cuando el juego comienza
+    conn.sendall(f"{player_id}".encode())
+
+    # Iniciar el ciclo de actualizaciones periódicas
+    last_update_time = time.time()
 
     while True:
         try:
+            # Recibir datos del cliente (se espera 2 floats y un int: x, y, vida)
             data = conn.recv(1024).decode().strip()
             if not data:
                 break
             print(f"[Jugador {player_id}] → {data}")
 
-            if player_id == turn_index:
-                if data.startswith("MOVE") or data.startswith("JUMP") or data.startswith("CLIMB"):
-                    response = f"UPDATE move registered: {data}\n"
-                    conn.sendall(response.encode())
-                elif data.startswith("ATTACK"):
-                    response = f"HIT {{(player_id+1)%2}} vida_actual:90\n"
-                    conn.sendall(response.encode())
-                    with lock:
-                        turn_index = (turn_index + 1) % MAX_PLAYERS
-                    conn.sendall("ENDTURN\n".encode())
-                    time.sleep(0.5)
-                    players[turn_index].sendall("YOURTURN 3\n".encode())
+            # Si es el primer mensaje, esperar los 2 floats y el int (x, y, vida)
+            if data:
+                try:
+                    # Se esperan tres valores (x, y) flotantes y vida (entero)
+                    parts = data.split()
+                    if len(parts) == 3:
+                        x, y, health = float(parts[0]), float(parts[1]), int(parts[2])
+                        # Actualizar la posición y vida del jugador
+                        player_data[player_id]["position"] = (x, y)
+                        player_data[other_player_id]["health"] = health
+                        
+                        print(f"Jugador {player_id} actualizado: posición {x}, {y}, vida rival {health}")
+
+                        # Ahora enviar la información del otro jugador
+                        other_position = player_data[other_player_id]["position"]
+                        other_health = player_data[player_id]["health"]
+                        
+                        # Enviar al jugador actual la información del otro jugador
+                        conn.sendall(f"DATA {other_position[0]} {other_position[1]} {other_health}".encode())
+                    else:
+                        print(f"Datos incorrectos recibidos: {data}")
+                except ValueError as ve:
+                    print(f"Error al convertir datos: {ve}")
+                    conn.sendall(f"ERROR: Datos inválidos. Se esperaban 2 floats y un int.\n".encode())
+                    continue  # Ignorar este ciclo y esperar nuevos datos
+          
+            
+
         except Exception as e:
             print(f"Error: {e}")
             break
 
     conn.close()
+
 
 def start_server():
     HOST = '127.0.0.1'

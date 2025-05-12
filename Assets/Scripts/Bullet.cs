@@ -15,7 +15,7 @@ public class Bullet : MonoBehaviour
         // 2) Modo físico continuo (para objetos rápidos)
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         // 3) Le damos la velocidad una sola vez
-        rb.velocity = transform.right * speed;
+        rb.linearVelocity = transform.right * speed;
 
         // Mantengo la autodestrucción igual
         Destroy(gameObject, lifetime);
