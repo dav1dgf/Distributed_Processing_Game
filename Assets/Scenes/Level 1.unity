@@ -1414,6 +1414,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7299195845777415670, guid: 3bf3ccb0719d17e4daefa0ed86305065, type: 3}
+      propertyPath: turnManager
+      value: 
+      objectReference: {fileID: 261344651}
+    - target: {fileID: 7299195845777415670, guid: 3bf3ccb0719d17e4daefa0ed86305065, type: 3}
       propertyPath: arenaLeftLimit
       value: -20
       objectReference: {fileID: 0}
@@ -1493,6 +1497,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1730187475}
   m_SourcePrefab: {fileID: 100100000, guid: 3bf3ccb0719d17e4daefa0ed86305065, type: 3}
+--- !u!4 &826338653 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2936090264105896907, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+  m_PrefabInstance: {fileID: 2163255644316135196}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &909441716
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5301,6 +5310,30 @@ PrefabInstance:
       propertyPath: initialScale.z
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4002609982624697793, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: FloorController
+      value: 
+      objectReference: {fileID: 826338653}
+    - target: {fileID: 4002609982624697793, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: FloorControllerRed
+      value: 
+      objectReference: {fileID: 826338653}
+    - target: {fileID: 4347625949161314832, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: m_Size.x
+      value: 0.3842125
+      objectReference: {fileID: 0}
+    - target: {fileID: 4347625949161314832, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: m_Size.y
+      value: 0.15743995
+      objectReference: {fileID: 0}
+    - target: {fileID: 4347625949161314832, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: m_Offset.x
+      value: -0.014843106
+      objectReference: {fileID: 0}
+    - target: {fileID: 4347625949161314832, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.3346997
+      objectReference: {fileID: 0}
     - target: {fileID: 6262100719821532326, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: m_Name
       value: FloorControllerRed
@@ -5350,7 +5383,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6262100719821532326, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1834929490466450868, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
