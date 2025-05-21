@@ -3,6 +3,7 @@ import threading
 import time
 import signal
 import sys
+import json 
 
 players = {}
 lock = threading.Lock()
@@ -22,11 +23,13 @@ def handle_client(conn, addr, player_id):
         time.sleep(0.5)
 
     try:
-        conn.sendall(f"{player_id}".encode())
+        conn.sendall(json.dumps({"type": "ASSIGN", "id": player_id}).encode() + b"\n")
+        print("Sending ID...")
         start_barrier.wait()
         time.sleep(1)
         print("Sending START...")
-        conn.sendall("START\n".encode())
+        conn.sendall(json.dumps({"type": "START"}).encode() + b"\n")
+
 
         while True:
             data = conn.recv(1024).decode().strip()
@@ -34,35 +37,45 @@ def handle_client(conn, addr, player_id):
                 break
             print(f"[Jugador {player_id}] → {data}")
             start_barrier.wait()
-            parts = data.split()
-            if len(parts) == 4 and parts[0] == "DATA":
-                x = float(parts[1].replace(',', '.'))
-                y = float(parts[2].replace(',', '.'))
-                health = float(parts[3])
+            try:
+                msg_json = json.loads(data)
+                if msg_json.get("type") == "DATA":
+                    #If fails then replace here everything
+                    x = float(msg_json.get("x", 0))
+                    y = float(msg_json.get("y", 0))
+                    health = float(msg_json.get("health", 0))
 
-                player_data[player_id]["position"] = (x, y)
-                player_data[other_player_id]["health"] = health
+                    player_data[player_id]["position"] = (x, y)
+                    player_data[other_player_id]["health"] = health
 
-                print(f"Jugador {player_id} actualizado: posición {x}, {y}, vida rival {health}")
+                    print(f"Jugador {player_id} actualizado: posición {x}, {y}, vida rival {health}")
 
-                other_conn = players.get(other_player_id)
-                if other_conn:
-                    try:
-                        rival_position = player_data[player_id]["position"]
-                        own_health = player_data[other_player_id]["health"]
-                        other_conn.sendall(f"DATA {rival_position[0]} {rival_position[1]} {own_health}\n".encode())
-                    except Exception as e:
-                        print(f"Error enviando al jugador {other_player_id}: {e}")
-                start_barrier.wait()
-                time.sleep(4)
-                print("Sending TURN...")
-                conn.sendall("TURN\n".encode())
-            elif data == "DISCONNECT":
-                print(f"[Jugador {player_id}] solicitó desconexión.")
-                with lock:
-                    players.pop(player_id, None)
-                break
-            else:
+                    other_conn = players.get(other_player_id)
+                    if other_conn:
+                        try:
+                            rival_position = player_data[player_id]["position"]
+                            own_health = player_data[other_player_id]["health"]
+                            data_to_send = {
+                                "type": "DATA",
+                                "x": rival_position[0],
+                                "y": rival_position[1],
+                                "health": own_health
+                            }
+                            other_conn.sendall(json.dumps(data_to_send).encode() + b"\n")
+                        except Exception as e:
+                            print(f"Error enviando al jugador {other_player_id}: {e}")
+                    start_barrier.wait()
+                    time.sleep(4)
+                    print("Sending TURN...")
+                    conn.sendall(json.dumps({"type": "TURN"}).encode() + b"\n")
+                if msg_json.get("type") == "DISCONNECT":
+                    print(f"[Jugador {player_id}] solicitó desconexión.")
+                    with lock:
+                        players.pop(player_id, None)
+                    break
+                else:
+                    print(f"Datos incorrectos recibidos: {data}")
+            except json.JSONDecodeError:
                 print(f"Datos incorrectos recibidos: {data}")
     except Exception as e:
         print(f"Error con el jugador {player_id}: {e}")

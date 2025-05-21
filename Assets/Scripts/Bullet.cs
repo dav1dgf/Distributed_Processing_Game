@@ -5,6 +5,7 @@ public class Bullet : MonoBehaviour
     public float speed = 10f;    // Bullet speed
     public float lifetime = 3f;  // How long before the bullet disappears
     Weapon weapon;
+    private float direction = 1;
 
     Rigidbody2D rb;
 
@@ -15,7 +16,7 @@ public class Bullet : MonoBehaviour
         // 2) Modo físico continuo (para objetos rápidos)
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         // 3) Le damos la velocidad una sola vez
-        rb.linearVelocity = transform.right * speed;
+        
 
         // Mantengo la autodestrucción igual
         Destroy(gameObject, lifetime);
@@ -30,6 +31,14 @@ public class Bullet : MonoBehaviour
     public void setWeapon(Weapon weapon)
     {
         this.weapon = weapon;
+    }
+    public void setDirection(float dir)
+    {
+        if (rb == null)
+            rb = GetComponent<Rigidbody2D>();
+
+        this.direction = dir;
+        rb.linearVelocity = new Vector2(dir * speed, 0f);
     }
 
     void OnCollisionEnter2D(Collision2D collision)

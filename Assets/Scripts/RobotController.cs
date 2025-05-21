@@ -14,7 +14,7 @@ public class RobotController : MonoBehaviour
     public float moveDistance = 1f;
     public float movementVelocity = 2f;
     public float jumpPower = 5f;
-    private bool facingRight;
+    [SerializeField] private bool facingRight;
     private float maxHealth = 100f;
     public float currentHealth = 100f;
     public HealthBar healthBar;
@@ -40,7 +40,6 @@ public class RobotController : MonoBehaviour
  
     private bool gameStarted = false;
     public Vector3 startPositionPlayer;
-    private Vector3 initialScale;
 
     public void StartGame()
     {
@@ -52,7 +51,7 @@ public class RobotController : MonoBehaviour
 
         // Reset position, scale, and rotation
         transform.position = startPositionPlayer;
-        transform.localScale = initialScale;
+        transform.localScale = new Vector3(2f, 2f, 1f);
         // Optionally reset any velocity if using Rigidbody
         var rb = GetComponent<Rigidbody2D>();
         if (rb != null)
@@ -66,9 +65,6 @@ public class RobotController : MonoBehaviour
 
     private void Awake()
     {
-        initialScale = transform.localScale;
-        facingRight = initialScale.x > 0f;
-        //turnManager = GameManager.GetComponent<TurnManager>();
         if (controls != null)
             movementActions = controls.FindActionMap("Movement");
     }
@@ -112,18 +108,24 @@ public class RobotController : MonoBehaviour
         rb2D.linearVelocity = new Vector2(direction.x * movementVelocity, rb2D.linearVelocity.y);
     }
 
-    public void AdjustRotation(float directionX)
+    private void AdjustRotation(float xDirection)
     {
-        if (Mathf.Approximately(directionX, 0f)) return;
+        if (xDirection > 0 && !facingRight)
+        {
+            Flip();
+        }
+        else if (xDirection < 0 && facingRight)
+        {
+            Flip();
+        }
+    }
 
-        bool wantRight = directionX > 0f;
-        float currentY = transform.eulerAngles.y;
-        bool isCurrentlyRight = Mathf.Approximately(currentY, 0f);
-        if (wantRight == isCurrentlyRight) return;
-
-        float newY = wantRight ? 0f : 180f;
-        transform.rotation = Quaternion.Euler(0f, newY, 0f);
-        facingRight = wantRight;
+    private void Flip()
+    {
+        facingRight = !facingRight;
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
     }
 
     private void Jump()

@@ -38,7 +38,7 @@ public class NetworkManager : MonoBehaviour
                 await client.ConnectAsync("127.0.0.1", 65432);
                 stream = client.GetStream();
                 Debug.Log("Conectado al servidor.");
-                text.text = "Connected, waiting 4 player...";
+                text.text = "Connected, waiting for player...";
             }
             catch (SocketException e)
             {
@@ -73,57 +73,56 @@ public class NetworkManager : MonoBehaviour
     private void HandleServerMessage(string msg)
     {
         Debug.Log("Servidor dijo: " + msg);
-
-
-        if (msg == "0" || msg == "1")
+        NetworkMessage baseMsg = null;
+        try
         {
-            gameStarted = true;
-            // El servidor envía el ID del jugador
-            playerId = int.Parse(msg);
-            Debug.Log($"Eres el Jugador {playerId}");
-            text.text = $"Eres el Jugador {playerId}";
+            baseMsg = JsonUtility.FromJson<NetworkMessage>(msg);
         }
-        else if (msg == "START")
+        catch
         {
-            turnManager.StartGame();
-            Debug.Log($"Server start");
-            text.text = "";
-            
+            Debug.LogWarning("Mensaje no reconocido: " + msg);
+            return;
         }
-        else if (msg.StartsWith("TURN"))
-        {
-            turnManager.EndTurn();
-           // text.text = "";
-
-        }
-        else if (msg.StartsWith("DATA"))
-        {
-            var parts = msg.Split(' ');
-            if (parts.Length == 4)
+        if (baseMsg.type == "ASSIGN")
             {
-                if (float.TryParse(parts[1].Replace(".", ","), out float x) &&
-                    float.TryParse(parts[2].Replace(".", ","), out float y) &&
-                    float.TryParse(parts[3].Replace(".", ","), out float health))
-                {
-                    enemyPosition = new Vector2(x, y);
-                    float myHealth = Mathf.RoundToInt(health);
-                    Debug.Log($"Posición del enemigo: {enemyPosition}, Salud del enemigo: {myHealth}");
-                    turnManager.StartTurn(enemyPosition, myHealth);
-                }
-                else
-                {
-                    Debug.LogWarning("Error al parsear los datos del enemigo.");
-                }
+                AssignMessage assignMessage = JsonUtility.FromJson<AssignMessage>(msg);
+                gameStarted = true;
+                // El servidor envía el ID del jugador
+                playerId = assignMessage.id;
+                Debug.Log($"Eres el Jugador {playerId}");
+                text.text = $"Eres el Jugador {playerId}";
             }
-        }
+            else if (baseMsg.type == "START")
+            {
+                turnManager.StartGame();
+                Debug.Log($"Server start");
+                text.text = "";
+
+            }
+            else if (baseMsg.type == "TURN")
+            {
+                turnManager.EndTurn();
+                // text.text = "";
+
+            }
+            else if (baseMsg.type == "DATA")
+            {
+                DataMessage dataMsg = JsonUtility.FromJson<DataMessage>(msg);
+                enemyPosition = new Vector2(dataMsg.x, dataMsg.y);
+                float myHealth = Mathf.RoundToInt(dataMsg.health);
+                Debug.Log($"Posición del enemigo: {enemyPosition}, Salud del enemigo: {myHealth}");
+                turnManager.StartTurn(enemyPosition, myHealth);
+            }
+        
+
     }
 
+    //JSON
 
-
-        public void SendPlayerInfoToServer(float x, float y, float health)
+    public void SendPlayerInfoToServer(float x, float y, float health)
     {
-        string msg = $"DATA {x} {y} {health}";
-
+        DataMessage dataMsg = new DataMessage(x, y, health);
+        string msg = JsonUtility.ToJson(dataMsg);
         SendToServer(msg);
     }
 
@@ -134,7 +133,9 @@ public class NetworkManager : MonoBehaviour
         try
         {
             // Enviar un mensaje de desconexión al servidor (opcional)
-            SendToServer("DISCONNECT");
+            DisconnectMessage dataMsg = new DisconnectMessage();
+            string msg = JsonUtility.ToJson(dataMsg);
+            SendToServer(msg);
 
             // Cerrar stream y conexión
             if (stream != null)
@@ -176,5 +177,49 @@ public class NetworkManager : MonoBehaviour
         {
             client.Close();
         }
+    }
+}
+
+[Serializable]
+public class NetworkMessage
+{
+    public string type; // e.g. "DATA", "TURN", "START", ASSIGN.
+}
+
+[Serializable]
+public class DataMessage : NetworkMessage
+{
+    public float x;
+    public float y;
+    public float health;
+
+    public DataMessage(float x, float y, float health)
+    {
+        this.type = "DATA";
+        this.x = x;
+        this.y = y;
+        this.health = health;
+    }
+}
+
+[Serializable]
+public class AssignMessage : NetworkMessage
+{
+    public int id;
+
+    public AssignMessage(int id)
+    {
+        this.type = "ASSIGN";
+        this.id = id;
+    }
+}
+
+[Serializable]
+public class DisconnectMessage : NetworkMessage
+{
+    public DisconnectMessage()
+    {
+        this.type = "DISCONNECT";
+
     }
 }

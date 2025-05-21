@@ -44,9 +44,12 @@ public class Weapon : MonoBehaviour
             StartCoroutine(Reload());
             return;
         }
+        // Its not hte parent, its the parent of the parent
+        // XOR logic :)
+        float direction = ((transform.parent.parent.localScale.x >= 0) ^ (transform.parent.parent.GetComponent<SpriteRenderer>().flipX)) ? 1f : -1f;
 
-        float direction = transform.parent.localScale.x >= 0 ? 1f : -1f;
         float offset = xOffset * direction;
+        //Debug.Log("Bullet fired in direction: " + direction);
         Vector3 firePosition = transform.position + new Vector3(offset, 0f, 0f);
         GameObject bullet = Instantiate(bulletPrefab, firePosition, transform.rotation);
         Bullet bulletScript = bullet.GetComponent<Bullet>();
@@ -54,6 +57,7 @@ public class Weapon : MonoBehaviour
         if (bulletScript != null)
         {
             bulletScript.setWeapon(this);  // Assuming Bullet script has a method to receive the weapon reference
+            bulletScript.setDirection(direction);
         }
 
         currentAmmo--;
