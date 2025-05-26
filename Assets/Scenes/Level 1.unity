@@ -504,7 +504,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8225404663799927958, guid: 5f621e050045e24419bdac3170244d70, type: 3}
       propertyPath: m_IsTrigger
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 8806045055431161606, guid: 5f621e050045e24419bdac3170244d70, type: 3}
@@ -560,7 +560,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Robot1: {fileID: 299720964}
-  Robot2: {fileID: 0}
+  Robot2: {fileID: 239790999}
   isBlueTurn: 1
   text: {fileID: 1175158846}
   networkManager: {fileID: 2054395508}
@@ -5274,6 +5274,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Robot Rojo
       objectReference: {fileID: 0}
+    - target: {fileID: 1966567397840837153, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: m_SortingOrder
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4002609982624697793, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: weapon
       value: 
@@ -5318,6 +5322,14 @@ PrefabInstance:
       propertyPath: FloorControllerRed
       value: 
       objectReference: {fileID: 826338653}
+    - target: {fileID: 4002609982624697793, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: startPositionPlayer.x
+      value: -2.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002609982624697793, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: startPositionPlayer.y
+      value: -1.83
+      objectReference: {fileID: 0}
     - target: {fileID: 4347625949161314832, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: m_Size.x
       value: 0.3842125
@@ -5352,7 +5364,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8894273526333991437, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 499.55655
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8894273526333991437, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: m_LocalRotation.w

@@ -35,7 +35,7 @@ public class NetworkManager : MonoBehaviour
             try
             {
                 client = new TcpClient();
-                await client.ConnectAsync("127.0.0.1", 65432);
+                await client.ConnectAsync("172.20.10.2", 65432);
                 stream = client.GetStream();
                 Debug.Log("Conectado al servidor.");
                 text.text = "Connected, waiting for player...";
@@ -51,6 +51,8 @@ public class NetworkManager : MonoBehaviour
     private async Task ListenForServerMessages()
     {
         byte[] buffer = new byte[1024];
+        StringBuilder messageBuffer = new StringBuilder();
+
         while (true)
         {
             int length;
@@ -63,10 +65,22 @@ public class NetworkManager : MonoBehaviour
                 Debug.LogError("Red caida: " + e);
                 break;
             }
+
             if (length == 0) continue;
 
-            string msg = Encoding.ASCII.GetString(buffer, 0, length).Trim();
-            HandleServerMessage(msg);
+            messageBuffer.Append(Encoding.ASCII.GetString(buffer, 0, length));
+
+            while (true)
+            {
+                string allMessages = messageBuffer.ToString();
+                int newlineIndex = allMessages.IndexOf('\n');
+                if (newlineIndex == -1) break;
+
+                string msg = allMessages.Substring(0, newlineIndex).Trim();
+                messageBuffer.Remove(0, newlineIndex + 1);
+
+                HandleServerMessage(msg);
+            }
         }
     }
 
@@ -129,7 +143,7 @@ public class NetworkManager : MonoBehaviour
     public void EndGame()
     {
         Debug.Log("Desconectando del servidor...");
-
+        SendPlayerInfoToServer(0, 0, -100);
         try
         {
             // Enviar un mensaje de desconexión al servidor (opcional)

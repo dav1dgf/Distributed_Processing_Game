@@ -65,7 +65,7 @@ def handle_client(conn, addr, player_id):
                         except Exception as e:
                             print(f"Error enviando al jugador {other_player_id}: {e}")
                     start_barrier.wait()
-                    time.sleep(5)
+                    #time.sleep(4)
                     print("Sending TURN...")
                     conn.sendall(json.dumps({"type": "TURN"}).encode() + b"\n")
                 elif msg_json.get("type") == "DISCONNECT":

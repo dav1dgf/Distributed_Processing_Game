@@ -41,6 +41,7 @@ public class Bullet : MonoBehaviour
         rb.linearVelocity = new Vector2(dir * speed, 0f);
     }
 
+    /*
     void OnCollisionEnter2D(Collision2D collision)
     {
         // Primer log: nos dice qué objeto ha colisionado
@@ -60,8 +61,26 @@ public class Bullet : MonoBehaviour
                 robot.TakeDamage(weapon.damage);
             Destroy(gameObject);
         }
-    }
+    }*/
 
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        Debug.Log($"Bala impactó: Name='{other.gameObject.name}' Tag='{other.gameObject.tag}' Layer='{LayerMask.LayerToName(other.gameObject.layer)}'");
+
+        if (other.CompareTag("FloorGun"))
+        {
+            Debug.Log("  → ¡Detectado suelo por tag FloorGun!");
+            Destroy(gameObject);
+        }
+
+        if (other.CompareTag("Player"))
+        {
+            var robot = other.GetComponent<RobotController>();
+            if (robot != null)
+                robot.TakeDamage(weapon.damage);
+            Destroy(gameObject);
+        }
+    }
 
 
 }
