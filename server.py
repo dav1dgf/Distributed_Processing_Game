@@ -80,6 +80,7 @@ def handle_client(conn, addr, player_id):
                 print(f"Datos incorrectos recibidos: {data}")
     except Exception as e:
         print(f"Error con el jugador {player_id}: {e}")
+        shutdown_server()
     finally:
         conn.close()
 

@@ -2,78 +2,49 @@
 
 public class Bullet : MonoBehaviour
 {
-    public float speed = 10f;    // Bullet speed
-    public float lifetime = 3f;  // How long before the bullet disappears
+    public float speed = 10f;
+    public float lifetime = 3f;
     Weapon weapon;
     private float direction = 1;
-
     Rigidbody2D rb;
 
-    void Start()
-    {
-        // 1) Tomamos la referencia al Rigidbody2D
-        rb = GetComponent<Rigidbody2D>();
-        // 2) Modo físico continuo (para objetos rápidos)
-        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        // 3) Le damos la velocidad una sola vez
-        
-
-        // Mantengo la autodestrucción igual
-        Destroy(gameObject, lifetime);
-    }
-
-    // Ya no necesitamos Update(), Unity moverá la bala por física:
-    // void Update()
-    // {
-    //     transform.Translate(Vector2.right * speed * Time.deltaTime);
-    // }
+    
 
     public void setWeapon(Weapon weapon)
     {
         this.weapon = weapon;
     }
+
     public void setDirection(float dir)
     {
-        if (rb == null)
-            rb = GetComponent<Rigidbody2D>();
-
-        this.direction = dir;
+        direction = dir;
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
         rb.linearVelocity = new Vector2(dir * speed, 0f);
     }
 
-    /*
-    void OnCollisionEnter2D(Collision2D collision)
+    void Start()
     {
-        // Primer log: nos dice qué objeto ha colisionado
-        Debug.Log($"Bala colisionó con: Name='{collision.gameObject.name}' Tag='{collision.gameObject.tag}' Layer='{LayerMask.LayerToName(collision.gameObject.layer)}'");
+        rb = GetComponent<Rigidbody2D>();
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.gravityScale = 0;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
-        // Ahora tu lógica normal
-        if (collision.gameObject.CompareTag("FloorGun"))
-        {
-            Debug.Log("  → ¡Detectado suelo por tag FloorGun!");
-            Destroy(gameObject);
-        }
+        Collider2D col = GetComponent<Collider2D>();
+        col.isTrigger = true;  // <-- IMPORTANTE: marcar como trigger para que no empuje
 
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            var robot = collision.gameObject.GetComponent<RobotController>();
-            if (robot != null)
-                robot.TakeDamage(weapon.damage);
-            Destroy(gameObject);
-        }
-    }*/
+        rb.linearVelocity = new Vector2(direction * speed, 0f);
+        Destroy(gameObject, lifetime);
+    }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log($"Bala impactó: Name='{other.gameObject.name}' Tag='{other.gameObject.tag}' Layer='{LayerMask.LayerToName(other.gameObject.layer)}'");
+        Debug.Log($"Bala impactó con: {other.gameObject.name}");
 
         if (other.CompareTag("FloorGun"))
         {
-            Debug.Log("  → ¡Detectado suelo por tag FloorGun!");
             Destroy(gameObject);
         }
-
-        if (other.CompareTag("Player"))
+        else if (other.CompareTag("Player"))
         {
             var robot = other.GetComponent<RobotController>();
             if (robot != null)
@@ -81,6 +52,4 @@ public class Bullet : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
-
 }
