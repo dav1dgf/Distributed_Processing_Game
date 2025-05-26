@@ -4591,7 +4591,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.005616784, y: -0.07874833}
+  m_Offset: {x: -0.005616784, y: -0.0015567206}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -4601,7 +4601,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.7865056, y: 0.17265046}
+  m_Size: {x: 0.7865056, y: 0.18980423}
   m_EdgeRadius: 0
 --- !u!114 &1775066636 stripped
 MonoBehaviour:
@@ -5274,9 +5274,37 @@ PrefabInstance:
       propertyPath: m_Name
       value: Robot Rojo
       objectReference: {fileID: 0}
+    - target: {fileID: 1834929490466450868, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 1966567397840837153, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: m_SortingOrder
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2936090264105896907, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.98
+      objectReference: {fileID: 0}
+    - target: {fileID: 2936090264105896907, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 2936090264105896907, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 2936090264105896907, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3405903695471178825, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: m_Size.y
+      value: 0.2186892
+      objectReference: {fileID: 0}
+    - target: {fileID: 3405903695471178825, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.2574802
       objectReference: {fileID: 0}
     - target: {fileID: 4002609982624697793, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: weapon
@@ -5303,6 +5331,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 261344651}
     - target: {fileID: 4002609982624697793, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: arenaLeftLimit
+      value: -20
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002609982624697793, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: initialScale.x
       value: 2
       objectReference: {fileID: 0}
@@ -5318,6 +5350,10 @@ PrefabInstance:
       propertyPath: FloorController
       value: 
       objectReference: {fileID: 826338653}
+    - target: {fileID: 4002609982624697793, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: arenaRightLimit
+      value: -20
+      objectReference: {fileID: 0}
     - target: {fileID: 4002609982624697793, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: FloorControllerRed
       value: 
