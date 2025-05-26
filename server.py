@@ -72,6 +72,7 @@ def handle_client(conn, addr, player_id):
                     print(f"[Jugador {player_id}] solicitó desconexión.")
                     with lock:
                         players.pop(player_id, None)
+                    shutdown_server()
                     break
                 else:
                     print(f"Datos incorrectos recibidos: {data}")
