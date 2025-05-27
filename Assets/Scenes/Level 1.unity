@@ -5292,7 +5292,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2936090264105896907, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.03
+      value: -0.268
       objectReference: {fileID: 0}
     - target: {fileID: 2936090264105896907, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -5355,6 +5355,14 @@ PrefabInstance:
       value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 4002609982624697793, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: boxDimensions.x
+      value: 0.74
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002609982624697793, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: boxDimensions.y
+      value: 0.36
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002609982624697793, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: FloorControllerRed
       value: 
       objectReference: {fileID: 826338653}
@@ -5392,11 +5400,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8894273526333991437, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.55
+      value: -2.549
       objectReference: {fileID: 0}
     - target: {fileID: 8894273526333991437, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.83
+      value: -1.88
       objectReference: {fileID: 0}
     - target: {fileID: 8894273526333991437, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: m_LocalPosition.z
