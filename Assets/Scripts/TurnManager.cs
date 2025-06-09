@@ -57,16 +57,16 @@ public class TurnManager : MonoBehaviour
         Robot1.GetComponent<RobotController>().enabled = false;
         Robot2.GetComponent<RobotController>().enabled = false;
 
-        if (loser == "Robot Rojo")
+        if (loser == "Red Robot")
         {
             Robot2.GetComponent<RobotController>().TakeDamage(100);
         }
-        else if (loser == "Robot Azul")
+        else if (loser == "Blue Robot")
         {
             Robot1.GetComponent<RobotController>().TakeDamage(100);
         }
         // Show winner text
-        string winner = loser == "Robot Rojo" ? "Robot Azul" : "Robot Rojo";
+        string winner = loser == "Red Robot" ? "Blue Robot" : "Red Robot";
         text.text = $"{winner} wins!";
         Debug.Log($"{winner} wins!");
         if (networkManager != null)

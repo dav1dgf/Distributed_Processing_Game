@@ -136,7 +136,7 @@ public class NetworkManager : MonoBehaviour
             {
             WinnerMessage dataMsg = JsonUtility.FromJson<WinnerMessage>(msg);
             string winner = dataMsg.winner;
-                string loser = winner == "Robot Azul" ? "Robot Rojo" : "Robot Azul";
+                string loser = winner == "Red Robot" ? "Blue Robot" : "Red Robot";
                 turnManager.GameEnd(loser);
             }
 

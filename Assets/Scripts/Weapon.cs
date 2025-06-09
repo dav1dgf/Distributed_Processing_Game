@@ -10,7 +10,7 @@ public class Weapon : MonoBehaviour
 
     [Header("Bullet Settings")]
     public GameObject bulletPrefab;
-    private float xOffset = 0.5f;             // Bullet spawn offset from weapon
+    private float xOffset = 1f;             // Bullet spawn offset from weapon
 
     private int currentAmmo;
     private float nextFireTime = 0f;
