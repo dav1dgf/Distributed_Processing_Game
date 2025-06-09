@@ -5,9 +5,13 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
 using TMPro;
+using System.Threading;
+
+
 
 public class NetworkManager : MonoBehaviour
 {
+    private CancellationTokenSource cancellationTokenSource;
     private TcpClient client;
     private NetworkStream stream;
     private Queue<string> incomingMessages = new Queue<string>();
@@ -24,8 +28,9 @@ public class NetworkManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private async void Start()
     {
+        cancellationTokenSource = new CancellationTokenSource();
         await TryConnectToServerRepeatedly();
-        await ListenForServerMessages();
+        _ = ListenForServerMessages(cancellationTokenSource.Token); // fire-and-forget
     }
 
     private async Task TryConnectToServerRepeatedly()
@@ -48,21 +53,26 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    private async Task ListenForServerMessages()
+    private async Task ListenForServerMessages(CancellationToken cancellationToken)
     {
         byte[] buffer = new byte[1024];
         StringBuilder messageBuffer = new StringBuilder();
 
-        while (true)
+        while (!cancellationToken.IsCancellationRequested)
         {
             int length;
             try
             {
-                length = await stream.ReadAsync(buffer, 0, buffer.Length);
+                length = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log("Listen cancelled.");
+                break;
             }
             catch (Exception e)
             {
-                Debug.LogError("Red caida: " + e);
+                Debug.LogError("Net fallen: " + e);
                 break;
             }
 
@@ -82,6 +92,8 @@ public class NetworkManager : MonoBehaviour
                 HandleServerMessage(msg);
             }
         }
+
+        Debug.Log("Listen ended.");
     }
 
     private void HandleServerMessage(string msg)
@@ -157,9 +169,16 @@ public class NetworkManager : MonoBehaviour
         string msg = JsonUtility.ToJson(dataMsg);
         SendToServer(msg);
     }
+
     public async void Disconnect()
     {
         Debug.Log("Desconectando del servidor...");
+
+        // Cancel the listening task
+        cancellationTokenSource?.Cancel();
+
+        // Wait a moment to ensure tasks finish
+        await Task.Delay(100);
 
         if (stream != null)
         {
