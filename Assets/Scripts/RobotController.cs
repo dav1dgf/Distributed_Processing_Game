@@ -146,8 +146,12 @@ public class RobotController : MonoBehaviour
         }
     }
 
+    private bool isDead = false;
+
     public void TakeDamage(float damage)
     {
+        if (isDead) return; // Prevent processing if already dead
+
         currentHealth = healthBar.getHealth() - damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         healthBar.UpdateHealth(currentHealth);
@@ -158,14 +162,15 @@ public class RobotController : MonoBehaviour
         {
             Die();
         }
-            
     }
 
     public void Die()
     {
+        if (isDead) return; // Redundant guard, extra safety
+        isDead = true;
+
         Debug.Log($"{gameObject.name} has been destroyed!");
         turnManager.GameEnd(gameObject.name);
-
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -176,6 +181,7 @@ public class RobotController : MonoBehaviour
             healthBar.UpdateHealth(0);
 
             turnManager.GameEnd(gameObject.name);
+            this.enabled = false;
         }
     }
 
