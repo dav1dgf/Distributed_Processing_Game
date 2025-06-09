@@ -32,7 +32,7 @@ A 2D local/Online multiplayer shooter built in Unity. Two robots—**Red** vs **
 - **Headless Server**  
   Lightweight Python implementation for server and client
 ---
-## External frameworks çand libraries:
+## External frameworks and libraries:
 - Unity
 ---
 ## 👥 Team Contributions
@@ -41,7 +41,7 @@ A 2D local/Online multiplayer shooter built in Unity. Two robots—**Red** vs **
 |------------------|-------------------------------------------------------------------------------|
 | Jairo López      | Designed the UI of Levels, Initial Scene and Level selector. Mechanics of Spikes and stairs FloorController for jumping + Communication protocol                 |
 | David Gutiérrez  | Created the healthbar and health mechanic for robots dying in spikes, etc. and proper movement of the robots + Client Implementation                             |
-| Sara González    | Build the robots and gun implementations + Server implementation                                                                                                 |
+| Sara González    | Server implementation                                                                                                 |
 
 ---
 ## 🛠️ Concurrent Programming Methods
