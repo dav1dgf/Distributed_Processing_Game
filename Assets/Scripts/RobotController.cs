@@ -155,7 +155,11 @@ public class RobotController : MonoBehaviour
         Debug.Log($"{gameObject.name} took {damage} damage! Health: {currentHealth}");
 
         if (currentHealth <= 0 && gameStarted)
+        {
             Die();
+            currentHealth = 0;
+        }
+            
     }
 
     public void Die()
