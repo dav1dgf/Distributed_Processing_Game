@@ -76,12 +76,12 @@ def handle_client(conn, addr, player_id):
                     
                     health = float(msg_json.get("health", 0))
                     #Check for comply in position and health, if x < -20, x>20 | y< -3 y > 3| health <0 discard msg
-                    if x < -20 or x > 20 or y < -3 or y > 3 or health < 0:
+                    if x < -20 or x > 20 or y < -5 or y > 5 or health < 0:
                         print(f"Received invalid data from player {player_id}: position=({x},{y}), health={health}. Discarding message.")
-                        continue  # This discards the data by skipping the rest of the loop iteration
                     # Update this player's position and the opponent's health
-                    player_data[player_id]["position"] = (x, y)
-                    player_data[other_player_id]["health"] = health
+                    else:
+                        player_data[player_id]["position"] = (x, y)
+                        player_data[other_player_id]["health"] = health
 
                     print(f"Player {player_id} updated: position {x}, {y}, enemy health {health}")
 
