@@ -156,8 +156,8 @@ public class RobotController : MonoBehaviour
 
         if (currentHealth <= 0 && gameStarted)
         {
-            Die();
             currentHealth = 0;
+            Die();
         }
             
     }

@@ -109,7 +109,7 @@ def handle_client(conn, addr, player_id):
 
                 # Handle player disconnect request
                 elif msg_json.get("type") == "DISCONNECT":
-                    print(f"[Player {player_id}] requested disconnection.")
+                    print(f"[Player {player_id}] requested disconnection. Ending game")
                     with lock:
                         players.pop(player_id, None)
                     shutdown_server()
@@ -125,6 +125,10 @@ def handle_client(conn, addr, player_id):
         shutdown_server()
     finally:
         conn.close()
+
+def handle_sigint(signum, frame):
+    print("\n[SERVER] SIGINT received (Ctrl+C), closing server...\n")
+    shutdown_server()
 
 # Gracefully shut down the server and notify clients
 def shutdown_server(signum=None, frame=None):
@@ -153,7 +157,7 @@ def start_server():
     print(f"[SERVER] Waiting for connections at {HOST}:{PORT}...")
 
     # Handle Ctrl+C to cleanly stop the server
-    signal.signal(signal.SIGINT, shutdown_server)
+    signal.signal(signal.SIGINT, handle_sigint)
 
     player_id = 0
     while player_id < MAX_PLAYERS:

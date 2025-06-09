@@ -140,18 +140,18 @@ public class NetworkManager : MonoBehaviour
         SendToServer(msg);
     }
 
-    public async void EndGame()
+    public async void EndGame(string winner)
     {
         Debug.Log("Desconectando del servidor...");
-        SendPlayerInfoToServer(0, 0, 0);
+        
         try
         {
             // Enviar un mensaje de desconexión al servidor (opcional)
-            DisconnectMessage dataMsg = new DisconnectMessage();
+            DisconnectMessage dataMsg = new DisconnectMessage(winner);
             string msg = JsonUtility.ToJson(dataMsg);
             SendToServer(msg);
             // To avoid race condition
-            await Task.Delay(200);
+            await Task.Delay(5000);
             // Cerrar stream y conexión
             if (stream != null)
             {
@@ -188,7 +188,7 @@ public class NetworkManager : MonoBehaviour
     private void OnApplicationQuit()
     {
         // Cerrar la conexión cuando la aplicación se cierre
-        EndGame();
+        EndGame(string winner);
     }
 }
 
@@ -229,9 +229,10 @@ public class AssignMessage : NetworkMessage
 [Serializable]
 public class DisconnectMessage : NetworkMessage
 {
-    public DisconnectMessage()
+    public string winner;
+    public DisconnectMessage(string winner)
     {
         this.type = "DISCONNECT";
-
+        this.winner = winner;
     }
 }
