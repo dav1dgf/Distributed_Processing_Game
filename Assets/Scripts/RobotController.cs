@@ -156,7 +156,6 @@ public class RobotController : MonoBehaviour
 
         if (currentHealth <= 0 && gameStarted)
         {
-            currentHealth = 0;
             Die();
         }
             
@@ -172,7 +171,12 @@ public class RobotController : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Spike"))
-            TakeDamage(1000);
+        {
+            Debug.Log($"{gameObject.name} has been destroyed!");
+            healthBar.UpdateHealth(0);
+
+            turnManager.GameEnd(gameObject.name);
+        }
     }
 
     private void OnDrawGizmos()
