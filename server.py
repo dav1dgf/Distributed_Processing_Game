@@ -128,8 +128,8 @@ def handle_client(conn, addr, player_id):
                     disconnect_msg = {
                                 "type": "DISCONNECT"
                             }
-                    for conn in players:
-                        conn.sendall(json.dumps(winner_msg).encode() + b"\n")
+                    for conn in players.values():
+                        conn.sendall(json.dumps(disconnect_msg).encode() + b"\n")
                     shutdown_server()
                     break
 

@@ -135,7 +135,7 @@ public class NetworkManager : MonoBehaviour
             {
             WinnerMessage dataMsg = JsonUtility.FromJson<WinnerMessage>(msg);
             string winner = dataMsg.winner;
-                string loser = winner == "Red Robot" ? "Blue Robot" : "Red Robot";
+                string loser = winner == "Robot Rojo" ? "Robot Azul" : "Robot Rojot";
                 turnManager.GameEnd(loser);
             }
 
@@ -152,27 +152,15 @@ public class NetworkManager : MonoBehaviour
     }
 
     public async void EndGame(string winner)
-    {
-        Debug.Log("Desconectando del servidor...");
-        
-        try
-        {
-            // Enviar un mensaje de desconexión al servidor (opcional)
-            WinnerMessage dataMsg = new WinnerMessage(winner);
-            string msg = JsonUtility.ToJson(dataMsg);
-            SendToServer(msg);
-            // To avoid race condition
-            //await Task.Delay(5000);
-            // Cerrar stream y conexión
-            
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("Error al cerrar la conexión: " + e.Message);
-        }
+    {      
+        WinnerMessage dataMsg = new WinnerMessage(winner);
+        string msg = JsonUtility.ToJson(dataMsg);
+        SendToServer(msg);
     }
     public async void Disconnect()
     {
+        Debug.Log("Desconectando del servidor...");
+
         if (stream != null)
         {
             stream.Close();
