@@ -67,8 +67,20 @@ Below is an overview of the primary concurrency techniques and APIs used in this
    - All network calls are non-blocking, so Unity’s Update loop remains smooth and unblocked.
 
 2. **Python Server**  
-   - The main thread accepts TCP connections and spawns a new `threading.Thread` for each client.  
-   - Inside each `handle_client` thread, `Barrier.wait()` calls ensure both clients stay in sync before the game starts and before each turn.  
-   - `Lock` calls guard modifications to the shared `players` map, preventing concurrent write issues.  
-   - On Ctrl+C (`SIGINT`), `signal.signal` invokes `shutdown_server()`, closing all sockets cleanly.  
-
+- **Connections**: The server accepts up to 2 players. Each player runs in a separate thread.
+- **Synchronization**: `threading.Barrier` ensures that:
+  - Both players start the game at the same time.
+  - Turns are taken alternately and in sync.
+- **Communication Protocol**: All messages are sent as newline-delimited JSON over TCP:
+  - `ASSIGN`: assigns a unique `player_id`.
+  - `START`: notifies both players to begin.
+  - `DATA`: contains a player's position and the opponent's health.
+  - `TURN`: informs a player it’s their turn.
+  - `WINNER`: indicates the winning player.
+  - `DISCONNECT`: sent when the server shuts down.
+- **Validation**: The server discards any `DATA` message with:
+  - X position outside [-20, 20]
+  - Y position outside [-3, 3]
+  - Health less than 0
+- **Shutdown**:
+  - If a player sends a `WINNER` message, the game ends.
