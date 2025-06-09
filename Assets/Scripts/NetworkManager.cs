@@ -129,8 +129,7 @@ public class NetworkManager : MonoBehaviour
             }
             else if (baseMsg.type == "DISCONNECT")
             {
-                DisconnectMessage disconnectMsg = JsonUtility.FromJson<DisconnectMessage>(msg);
-                turnManager.GameEnd(playerId.ToString());
+                Disconnect();
             }
             else if (baseMsg.type == "WINNER")
             {
@@ -165,26 +164,29 @@ public class NetworkManager : MonoBehaviour
             // To avoid race condition
             //await Task.Delay(5000);
             // Cerrar stream y conexión
-            if (stream != null)
-            {
-                stream.Close();
-                stream = null;
-            }
-
-            if (client != null)
-            {
-                client.Close();
-                client = null;
-            }
-
-            Debug.Log("Conexión cerrada.");
+            
         }
         catch (Exception e)
         {
             Debug.LogError("Error al cerrar la conexión: " + e.Message);
         }
     }
+    public async void Disconnect()
+    {
+        if (stream != null)
+        {
+            stream.Close();
+            stream = null;
+        }
 
+        if (client != null)
+        {
+            client.Close();
+            client = null;
+        }
+
+        Debug.Log("Conexión cerrada.");
+    }
 
     private void SendToServer(string msg)
     {

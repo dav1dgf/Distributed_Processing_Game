@@ -125,6 +125,11 @@ def handle_client(conn, addr, player_id):
                             print(f"Failed to notify player {other_player_id} of WINNER: {e}")
                     with lock:
                         players.pop(player_id, None)
+                    disconnect_msg = {
+                                "type": "DISCONNECT"
+                            }
+                    for conn in players:
+                        conn.sendall(json.dumps(winner_msg).encode() + b"\n")
                     shutdown_server()
                     break
 
