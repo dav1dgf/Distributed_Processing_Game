@@ -63,9 +63,8 @@ public class TurnManager : MonoBehaviour
         Debug.Log($"{winner} wins!");
         if (networkManager != null)
         {
-            networkManager.EndGame();
+            networkManager.EndGame(winner);
         }
-        // Optional: Call another method or open a UI to restart or go to menu
     }
     public void StartTurn(Vector2 enemyPos, float health)
     {

@@ -188,7 +188,7 @@ public class NetworkManager : MonoBehaviour
     private void OnApplicationQuit()
     {
         // Cerrar la conexión cuando la aplicación se cierre
-        EndGame(string winner);
+        EndGame(null);
     }
 }
 
