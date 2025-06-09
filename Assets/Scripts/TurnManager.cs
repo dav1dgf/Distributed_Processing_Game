@@ -46,7 +46,7 @@ public class TurnManager : MonoBehaviour
 
     }
 
-  
+    bool gameEnd = false;
 
     public void GameEnd(string loser)
     {
@@ -56,7 +56,7 @@ public class TurnManager : MonoBehaviour
         // Disable both robot controllers
         Robot1.GetComponent<RobotController>().enabled = false;
         Robot2.GetComponent<RobotController>().enabled = false;
-
+        gameEnd = true;
         if (loser == "Robot Rojo")
         {
             Robot2.GetComponent<RobotController>().TakeDamage(100);
@@ -77,43 +77,47 @@ public class TurnManager : MonoBehaviour
     }
     public void StartTurn(Vector2 enemyPos, float health)
     {
-        GameObject enemyRobot = networkManager.playerId == 0 ? Robot2 : Robot1;
-        if (enemyPos != null && health!= null) { 
-            GameObject friendRobot = networkManager.playerId == 0 ? Robot1 : Robot2;
-            enemyRobot.transform.position = enemyPos;
-            friendRobot.GetComponent<RobotController>().TakeDamage(friendRobot.GetComponent<RobotController>().currentHealth - health);
-        }
-        string currentRobot = isBlueTurn ? "Robot1" : "Robot2";
-        Debug.Log($"{currentRobot}'s turn!");
-        text.text = currentRobot + " turn!";
-
-        // Enable movement for the current player, disable for the other
-        Robot1.GetComponent<RobotController>().enabled = isBlueTurn;
-        Robot2.GetComponent<RobotController>().enabled = !isBlueTurn;
-
-        // Stop movement of the robot not in turn
-        Rigidbody2D rb1 = Robot1.GetComponent<Rigidbody2D>();
-        Rigidbody2D rb2 = Robot2.GetComponent<Rigidbody2D>();
-        //NOT OPTIMAL (CHANGE)
-
-
-        enemyRobot.GetComponent<RobotController>().enabled = false;
-
-        if (!isBlueTurn && rb1 != null)
+        if (!gameEnd)
         {
-            rb1.linearVelocity = Vector2.zero;
-            rb1.bodyType = RigidbodyType2D.Kinematic;
-            rb2.bodyType = RigidbodyType2D.Dynamic;
+            GameObject enemyRobot = networkManager.playerId == 0 ? Robot2 : Robot1;
+            if (enemyPos != null && health != null)
+            {
+                GameObject friendRobot = networkManager.playerId == 0 ? Robot1 : Robot2;
+                enemyRobot.transform.position = enemyPos;
+                friendRobot.GetComponent<RobotController>().TakeDamage(friendRobot.GetComponent<RobotController>().currentHealth - health);
+            }
+            string currentRobot = isBlueTurn ? "Robot1" : "Robot2";
+            Debug.Log($"{currentRobot}'s turn!");
+            text.text = currentRobot + " turn!";
+
+            // Enable movement for the current player, disable for the other
+            Robot1.GetComponent<RobotController>().enabled = isBlueTurn;
+            Robot2.GetComponent<RobotController>().enabled = !isBlueTurn;
+
+            // Stop movement of the robot not in turn
+            Rigidbody2D rb1 = Robot1.GetComponent<Rigidbody2D>();
+            Rigidbody2D rb2 = Robot2.GetComponent<Rigidbody2D>();
+            //NOT OPTIMAL (CHANGE)
+
+
+            enemyRobot.GetComponent<RobotController>().enabled = false;
+
+            if (!isBlueTurn && rb1 != null)
+            {
+                rb1.linearVelocity = Vector2.zero;
+                rb1.bodyType = RigidbodyType2D.Kinematic;
+                rb2.bodyType = RigidbodyType2D.Dynamic;
 
 
 
-        }
-        else if (isBlueTurn && rb2 != null)
-        {
-            rb2.linearVelocity = Vector2.zero;
-            rb2.bodyType = RigidbodyType2D.Kinematic;
-            rb1.bodyType = RigidbodyType2D.Dynamic;
+            }
+            else if (isBlueTurn && rb2 != null)
+            {
+                rb2.linearVelocity = Vector2.zero;
+                rb2.bodyType = RigidbodyType2D.Kinematic;
+                rb1.bodyType = RigidbodyType2D.Dynamic;
 
+            }
         }
     }
 

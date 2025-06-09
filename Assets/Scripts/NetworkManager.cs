@@ -168,6 +168,7 @@ public class NetworkManager : MonoBehaviour
         WinnerMessage dataMsg = new WinnerMessage(winner);
         string msg = JsonUtility.ToJson(dataMsg);
         SendToServer(msg);
+        
     }
 
     public async void Disconnect()
@@ -178,7 +179,6 @@ public class NetworkManager : MonoBehaviour
         cancellationTokenSource?.Cancel();
 
         // Wait a moment to ensure tasks finish
-        await Task.Delay(100);
 
         if (stream != null)
         {
