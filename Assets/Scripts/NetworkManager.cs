@@ -224,13 +224,3 @@ public class AssignMessage : NetworkMessage
         this.id = id;
     }
 }
-
-[Serializable]
-public class DisconnectMessage : NetworkMessage
-{
-    public DisconnectMessage()
-    {
-        this.type = "DISCONNECT";
-
-    }
-}
