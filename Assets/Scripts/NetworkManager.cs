@@ -63,7 +63,10 @@ public class NetworkManager : MonoBehaviour
             int length;
             try
             {
-                length = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
+                if (cancellationToken.IsCancellationRequested)
+                    length = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
+                else
+                    length = 0;
             }
             catch (OperationCanceledException)
             {
