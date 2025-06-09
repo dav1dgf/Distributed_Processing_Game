@@ -59,11 +59,11 @@ public class TurnManager : MonoBehaviour
 
         if (loser == "Red Robot")
         {
-            Robot2.GetComponent<RobotController>().takeDamage(100);
+            Robot2.GetComponent<RobotController>().TakeDamage(100);
         }
         else if (loser == "Blue Robot")
         {
-            Robot1.GetComponent<RobotController>().takeDamage(100);
+            Robot1.GetComponent<RobotController>().TakeDamage(100);
         }
         // Show winner text
         string winner = loser == "Red Robot" ? "Blue Robot" : "Red Robot";
