@@ -57,6 +57,14 @@ public class TurnManager : MonoBehaviour
         Robot1.GetComponent<RobotController>().enabled = false;
         Robot2.GetComponent<RobotController>().enabled = false;
 
+        if (loser == "Red Robot")
+        {
+            Robot2.GetComponent<RobotController>().takeDamage(100);
+        }
+        else if (loser == "Blue Robot")
+        {
+            Robot1.GetComponent<RobotController>().takeDamage(100);
+        }
         // Show winner text
         string winner = loser == "Red Robot" ? "Blue Robot" : "Red Robot";
         text.text = $"{winner} wins!";
@@ -65,6 +73,7 @@ public class TurnManager : MonoBehaviour
         {
             networkManager.EndGame(winner);
         }
+
     }
     public void StartTurn(Vector2 enemyPos, float health)
     {
