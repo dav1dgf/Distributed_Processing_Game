@@ -107,9 +107,22 @@ def handle_client(conn, addr, player_id):
                     print("Sending TURN...")
                     conn.sendall(json.dumps({"type": "TURN"}).encode() + b"\n")
 
-                # Handle player disconnect request
-                elif msg_json.get("type") == "DISCONNECT":
-                    print(f"[Player {player_id}] requested disconnection. Ending game")
+                # Handle player winner request
+                elif msg_json.get("type") == "WINNER":
+                    winner = msg_json.get("winner")
+                    print(f"[Player {player_id}] reported WINNER: {winner}")
+
+                    # Notify the other player who won
+                    other_conn = players.get(other_player_id)
+                    if other_conn:
+                        try:
+                            winner_msg = {
+                                "type": "WINNER",
+                                "winner": winner
+                            }
+                            other_conn.sendall(json.dumps(winner_msg).encode() + b"\n")
+                        except Exception as e:
+                            print(f"Failed to notify player {other_player_id} of WINNER: {e}")
                     with lock:
                         players.pop(player_id, None)
                     shutdown_server()

@@ -127,7 +127,19 @@ public class NetworkManager : MonoBehaviour
                 Debug.Log($"Posición del enemigo: {enemyPosition}, Salud del enemigo: {myHealth}");
                 turnManager.StartTurn(enemyPosition, myHealth);
             }
-        
+            else if (baseMsg.type == "DISCONNECT")
+            {
+                DisconnectMessage disconnectMsg = JsonUtility.FromJson<DisconnectMessage>(msg);
+                turnManager.GameEnd(playerId.ToString());
+            }
+            else if (baseMsg.type == "WINNER")
+            {
+            WinnerMessage dataMsg = JsonUtility.FromJson<WinnerMessage>(msg);
+            string winner = dataMsg.winner;
+                string loser = winner == "Red Robot" ? "Blue Robot" : "Red Robot";
+                turnManager.GameEnd(loser);
+            }
+
 
     }
 
@@ -147,7 +159,7 @@ public class NetworkManager : MonoBehaviour
         try
         {
             // Enviar un mensaje de desconexión al servidor (opcional)
-            DisconnectMessage dataMsg = new DisconnectMessage(winner);
+            WinnerMessage dataMsg = new WinnerMessage(winner);
             string msg = JsonUtility.ToJson(dataMsg);
             SendToServer(msg);
             // To avoid race condition
@@ -227,12 +239,21 @@ public class AssignMessage : NetworkMessage
 }
 
 [Serializable]
-public class DisconnectMessage : NetworkMessage
+public class WinnerMessage : NetworkMessage
 {
     public string winner;
+    public WinnerMessage(string winner)
+    {
+        this.type = "WINNER";
+        this.winner = winner;
+    }
+}
+
+[Serializable]
+public class DisconnectMessage : NetworkMessage
+{
     public DisconnectMessage(string winner)
     {
         this.type = "DISCONNECT";
-        this.winner = winner;
     }
 }
