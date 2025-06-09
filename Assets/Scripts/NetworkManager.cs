@@ -140,7 +140,7 @@ public class NetworkManager : MonoBehaviour
         SendToServer(msg);
     }
 
-    public async void EndGame(string loser)
+    public async void EndGame()
     {
         Debug.Log("Desconectando del servidor...");
         SendPlayerInfoToServer(0, 0, 0);
@@ -188,7 +188,7 @@ public class NetworkManager : MonoBehaviour
     private void OnApplicationQuit()
     {
         // Cerrar la conexión cuando la aplicación se cierre
-        EndGame(null);
+        EndGame();
     }
 }
 
