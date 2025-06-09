@@ -13,7 +13,7 @@ A 2D local/Wi-Fi multiplayer shooter built in Unity. Two robots—**Red** vs **B
 ## 📸 Preview
 
 <p align="center">
-  <img src="./Assets/Images/Arena.png" alt="Arena Screenshot" width="600"/>
+  <img src="./Assets/Images/Arena.png" alt="Arena Screenshot" width="1000"/>
 </p>
 
 
