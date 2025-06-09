@@ -163,7 +163,7 @@ public class NetworkManager : MonoBehaviour
             string msg = JsonUtility.ToJson(dataMsg);
             SendToServer(msg);
             // To avoid race condition
-            await Task.Delay(5000);
+            //await Task.Delay(5000);
             // Cerrar stream y conexión
             if (stream != null)
             {

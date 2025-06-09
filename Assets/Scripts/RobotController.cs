@@ -172,7 +172,7 @@ public class RobotController : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Spike"))
-            TakeDamage(100);
+            TakeDamage(1000);
     }
 
     private void OnDrawGizmos()
