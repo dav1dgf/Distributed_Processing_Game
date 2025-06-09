@@ -4,6 +4,7 @@ import time
 import signal
 import sys
 import json 
+import os
 
 # Stores connected players' sockets indexed by their player ID
 players = {}
@@ -139,7 +140,7 @@ def shutdown_server(signum=None, frame=None):
             except:
                 pass
         players.clear()
-    sys.exit(0)
+    os._exit(0)
 
 # Start the game server
 def start_server():
