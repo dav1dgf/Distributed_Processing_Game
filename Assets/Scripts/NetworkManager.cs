@@ -63,7 +63,7 @@ public class NetworkManager : MonoBehaviour
             int length;
             try
             {
-                if (cancellationToken.IsCancellationRequested)
+                if (!cancellationToken.IsCancellationRequested)
                     length = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
                 else
                     length = 0;
@@ -119,7 +119,7 @@ public class NetworkManager : MonoBehaviour
                 // El servidor envía el ID del jugador
                 playerId = assignMessage.id;
                 Debug.Log($"Eres el Jugador {playerId}");
-                text.text = $"Eres el Jugador {playerId}";
+                text.text = $"You are player {playerId}";
             }
             else if (baseMsg.type == "START")
             {
