@@ -432,7 +432,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Robot1: {fileID: 0}
   Robot2: {fileID: 0}
-  isPlayerTurn: 1
+  isBlueTurn: 1
+  text: {fileID: 0}
+  networkManager: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -669,11 +671,11 @@ PrefabInstance:
     - target: {fileID: 5751951985537815767, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: rb2D
       value: 
-      objectReference: {fileID: 1661800454}
+      objectReference: {fileID: 0}
     - target: {fileID: 5751951985537815767, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: weapon
       value: 
-      objectReference: {fileID: 685848018}
+      objectReference: {fileID: 0}
     - target: {fileID: 5751951985537815767, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
       propertyPath: healthBar
       value: 
@@ -738,32 +740,19 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8894273526333991437, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.38
+      objectReference: {fileID: 0}
+    - target: {fileID: 8894273526333991437, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.14
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
---- !u!4 &685848017 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 841065901482767515, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
-  m_PrefabInstance: {fileID: 685848016}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &685848018 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4455641386494101194, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
-  m_PrefabInstance: {fileID: 685848016}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25c3699120cc7284ca578a3dd42a9c5b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &685848019 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8438245286695215732, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
-  m_PrefabInstance: {fileID: 685848016}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &809956125
 GameObject:
   m_ObjectHideFlags: 0
@@ -834,7 +823,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 27.4, y: 1.2}
+  m_AnchoredPosition: {x: -37, y: -35}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &948247951
@@ -2299,7 +2288,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 469, y: 232}
+  m_AnchoredPosition: {x: 437, y: 196.5}
   m_SizeDelta: {x: 150, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1330780779
@@ -3596,7 +3585,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 27.4, y: 1.2}
+  m_AnchoredPosition: {x: 99.99999, y: -25.000002}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1464786976
@@ -3684,7 +3673,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -42.880936, y: 3.630909, z: 46.97448, w: 9.279052}
+  m_margin: {x: -42.880936, y: 3.630909, z: 6.2517242, w: 9.279052}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -3734,7 +3723,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -470, y: 221}
+  m_AnchoredPosition: {x: -389, y: 196.5}
   m_SizeDelta: {x: 150, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1542812981
@@ -3837,11 +3826,6 @@ RectTransform:
   m_AnchoredPosition: {x: -5, y: 0}
   m_SizeDelta: {x: -20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!50 &1661800454 stripped
-Rigidbody2D:
-  m_CorrespondingSourceObject: {fileID: 7332048314114779227, guid: 5fcc87c6c5df4414fab24e2519e5b98a, type: 3}
-  m_PrefabInstance: {fileID: 685848016}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1825177179
 GameObject:
   m_ObjectHideFlags: 0
@@ -4231,7 +4215,7 @@ PrefabInstance:
     - target: {fileID: 7299195845777415670, guid: 3bf3ccb0719d17e4daefa0ed86305065, type: 3}
       propertyPath: enemyRobot
       value: 
-      objectReference: {fileID: 685848019}
+      objectReference: {fileID: 0}
     - target: {fileID: 7299195845777415670, guid: 3bf3ccb0719d17e4daefa0ed86305065, type: 3}
       propertyPath: facingRight
       value: 0
@@ -4247,7 +4231,7 @@ PrefabInstance:
     - target: {fileID: 7299195845777415670, guid: 3bf3ccb0719d17e4daefa0ed86305065, type: 3}
       propertyPath: FloorController
       value: 
-      objectReference: {fileID: 685848017}
+      objectReference: {fileID: 0}
     - target: {fileID: 7299195845777415670, guid: 3bf3ccb0719d17e4daefa0ed86305065, type: 3}
       propertyPath: arenaRightLimit
       value: 5
