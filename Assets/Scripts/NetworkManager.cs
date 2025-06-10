@@ -61,9 +61,10 @@ public class NetworkManager : MonoBehaviour
         while (!cancellationToken.IsCancellationRequested)
         {
             int length;
-            try
-            {
+            try { 
+
                 if (!cancellationToken.IsCancellationRequested)
+
                     length = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
                 else
                     length = 0;
@@ -171,6 +172,7 @@ public class NetworkManager : MonoBehaviour
         WinnerMessage dataMsg = new WinnerMessage(winner);
         string msg = JsonUtility.ToJson(dataMsg);
         SendToServer(msg);
+        
     }
 
     public async void Disconnect()
@@ -181,7 +183,6 @@ public class NetworkManager : MonoBehaviour
         cancellationTokenSource?.Cancel();
 
         // Wait a moment to ensure tasks finish
-        await Task.Delay(100);
 
         if (stream != null)
         {
@@ -212,7 +213,7 @@ public class NetworkManager : MonoBehaviour
     private void OnApplicationQuit()
     {
         // Cerrar la conexión cuando la aplicación se cierre
-        EndGame(null);
+        Disconnect();
     }
 }
 
